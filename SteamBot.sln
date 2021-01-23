@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamBot", "SteamBot.csproj", "{F138259E-8F07-4879-A95B-B6D1A1DEC237}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamApi", "..\SteamApi\SteamApi.csproj", "{16AB8E22-FDB0-4FFF-BDDC-3C1FC5D5582B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{10A4E68D-68F0-4304-88BC-BFF3E371302C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F138259E-8F07-4879-A95B-B6D1A1DEC237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F138259E-8F07-4879-A95B-B6D1A1DEC237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F138259E-8F07-4879-A95B-B6D1A1DEC237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F138259E-8F07-4879-A95B-B6D1A1DEC237}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16AB8E22-FDB0-4FFF-BDDC-3C1FC5D5582B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16AB8E22-FDB0-4FFF-BDDC-3C1FC5D5582B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16AB8E22-FDB0-4FFF-BDDC-3C1FC5D5582B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16AB8E22-FDB0-4FFF-BDDC-3C1FC5D5582B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A4E68D-68F0-4304-88BC-BFF3E371302C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A4E68D-68F0-4304-88BC-BFF3E371302C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A4E68D-68F0-4304-88BC-BFF3E371302C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A4E68D-68F0-4304-88BC-BFF3E371302C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2046DBDA-EB59-4DD1-AF86-16E03F2217B5}
+		RESX_NeutralResourcesLanguage = ru-RU
+	EndGlobalSection
+EndGlobal
