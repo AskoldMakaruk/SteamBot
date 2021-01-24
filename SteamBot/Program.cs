@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using BotFramework.Handlers;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using Ninject.Modules;
-using Ninject.Parameters;
-using Ninject.Planning.Bindings;
 using SteamApi;
 using SteamBot.Database;
 using SteamBot.Services;
@@ -20,13 +16,13 @@ namespace SteamBot
 		static void Main()
 		{
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
-			var json = File.ReadAllText("compact.json");
-			var jobject = JObject.Parse(json);
-			var list = jobject.Children().OfType<JProperty>().Select(a => new {Name = a.Name, Price = a.Value.Value<double>()}).ToList();
+			//var json = File.ReadAllText("compact.json");
+			//var jobject = JObject.Parse(json);
+			//var list = jobject.Children().OfType<JProperty>().Select(a => new {Name = a.Name, Price = a.Value.Value<double>()}).ToList();
 
-			Console.WriteLine("Star items: " + list.Count(a => a.Name.Contains("★")));
-			Console.WriteLine("AK's " + list.Count(a => a.Name.Contains("AK-47")));
-			Console.WriteLine("IsStatTrak items: " + list.Count(a => a.Name.Contains("IsStatTrak")));
+			//Console.WriteLine("Star items: " + list.Count(a => a.Name.Contains("★")));
+			//Console.WriteLine("AK's " + list.Count(a => a.Name.Contains("AK-47")));
+			//Console.WriteLine("IsStatTrak items: " + list.Count(a => a.Name.Contains("IsStatTrak")));
 
 			//Console.ReadLine();
 			//foreach (var child in jobject.Children().OfType<JProperty>())
@@ -44,14 +40,12 @@ namespace SteamBot
 
 		public static IConfiguration GetConfiguration()
 		{
-			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-			env ??= "DEVELOPMENT";
-			env = env switch
-			{
-				"DEVELOPMENT" => "Development",
-				"PRODUCTION" => "Production",
-				"Release" => "Production"
-			};
+#if DEBUG
+			const string env = "Development";
+#endif
+#if RELEASE
+			const string env = "Production";
+#endif
 			string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 			return new ConfigurationBuilder()
 				.SetBasePath(Directory.GetCurrentDirectory())
@@ -65,7 +59,6 @@ namespace SteamBot
 	{
 		public override void Load()
 		{
-			var config = Program.GetConfiguration();
 			Bind<TelegramContext>().To<TelegramContext>();
 			Bind<SteamService>().To<SteamService>();
 			Bind<SteamApiClient>().ToMethod(_ => new SteamApiClient(Program.GetConfiguration()["SteamApiToken"]));
