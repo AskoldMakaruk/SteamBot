@@ -144,4 +144,25 @@
   <data name="NewTradeText" xml:space="preserve">
     <value>Напишите название предмета:</value>
   </data>
+  <data name="YesBtn" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="EnterFloatText" xml:space="preserve">
+    <value>Введите float скина.</value>
+  </data>
+  <data name="Float_Factory_New" xml:space="preserve">
+    <value>Прямо из завода</value>
+  </data>
+  <data name="Float_Minimal_Wear" xml:space="preserve">
+    <value>Немного поношенное</value>
+  </data>
+  <data name="Float_Field_Tested" xml:space="preserve">
+    <value>После полевых испытаний</value>
+  </data>
+  <data name="Float_Well_Worn" xml:space="preserve">
+    <value>Поношенное </value>
+  </data>
+  <data name="Float_Battle_Scarred" xml:space="preserve">
+    <value>Закаленное в боях</value>
+  </data>
 </root>

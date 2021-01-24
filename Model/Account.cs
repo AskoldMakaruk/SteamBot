@@ -48,6 +48,33 @@ namespace SteamBot.Model
 		public Image Image { get; set; }
 
 		public string HashName => $"{(IsKnife ? Helper.Star : String.Empty)} {(IsStatTrak ? Helper.StatTrak : String.Empty)} {WeaponName} | {SkinName} ({Helper.GetFloatName(Float)})";
+
+		public void ParseHashName(string hashName)
+		{
+			var marketHashName = hashName;
+
+			IsKnife = marketHashName.Contains(Helper.Star);
+			if (IsKnife)
+			{
+				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
+			}
+
+			IsStatTrak = marketHashName.Contains(Helper.StatTrak);
+			if (IsStatTrak)
+			{
+				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
+			}
+
+			var delimiterIndx = marketHashName.IndexOf('|');
+
+			WeaponName = marketHashName[..delimiterIndx].Trim();
+			SkinName = marketHashName[(delimiterIndx + 2)..marketHashName.IndexOf('(')].Trim();
+		}
+
+		public string ToMarkupString()
+		{
+			return $"*{HashName}*\nPrice: {Price}$";
+		}
 	}
 
 	public class Image

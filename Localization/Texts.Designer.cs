@@ -70,6 +70,15 @@ namespace SteamBot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Введите float скина..
+        /// </summary>
+        public static string EnterFloatText {
+            get {
+                return ResourceManager.GetString("EnterFloatText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Пожайлуства укажите вашу ссылку на трейд. Ее можно получить [тут](https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url).
         /// </summary>
         public static string EnterTradeUrlText {
@@ -84,6 +93,51 @@ namespace SteamBot.Localization {
         public static string EnterUrlText {
             get {
                 return ResourceManager.GetString("EnterUrlText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Закаленное в боях.
+        /// </summary>
+        public static string Float_Battle_Scarred {
+            get {
+                return ResourceManager.GetString("Float_Battle_Scarred", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Прямо из завода.
+        /// </summary>
+        public static string Float_Factory_New {
+            get {
+                return ResourceManager.GetString("Float_Factory_New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to После полевых испытаний.
+        /// </summary>
+        public static string Float_Field_Tested {
+            get {
+                return ResourceManager.GetString("Float_Field_Tested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Немного поношенное.
+        /// </summary>
+        public static string Float_Minimal_Wear {
+            get {
+                return ResourceManager.GetString("Float_Minimal_Wear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Поношенное .
+        /// </summary>
+        public static string Float_Well_Worn {
+            get {
+                return ResourceManager.GetString("Float_Well_Worn", resourceCulture);
             }
         }
         
@@ -138,6 +192,15 @@ namespace SteamBot.Localization {
         public static string StartText {
             get {
                 return ResourceManager.GetString("StartText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Да.
+        /// </summary>
+        public static string YesBtn {
+            get {
+                return ResourceManager.GetString("YesBtn", resourceCulture);
             }
         }
     }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SteamApi;
@@ -35,16 +38,53 @@ namespace SteamBot.Services
 			_context = context;
 		}
 
+		public IEnumerable<JsonItem> FindItems(string name)
+		{
+			bool Compare(JsonItem a)
+			{
+				var hashName = a.Name.ToLower().Trim();
+				return hashName.Contains(name.ToLower().Trim());
+			}
+
+			return Bag.Where(Compare).DistinctBy(a => new {a.WeaponName, a.SkinName});
+		}
+
+		public JsonItem FindItem(string name, float fl)
+		{
+			bool Compare(JsonItem a)
+			{
+				var hashName = a.Name.ToLower().Trim();
+				var result = hashName.Contains(name.ToLower().Trim()) && hashName.Contains(Helper.GetFloatName(fl).ToLower().Trim());
+				if (result)
+				{
+					Console.WriteLine(hashName);
+					
+				}
+
+				return result;
+			}
+
+			return Bag.FirstOrDefault(Compare);
+		}
+
 		public async Task<Item> GetItem(string name, float fl)
 		{
-			Console.WriteLine($"Trying to get item with name {name} ({Helper.GetFloatName(fl)})");
+			Console.WriteLine($"Trying to get item with name {name} float: {fl} ({Helper.GetFloatName(fl)})");
 
-			var (hashName, price) = Bag.FirstOrDefault(a => a.Name.Contains(name.Trim()) && a.Name.Contains(Helper.GetFloatName(fl)));
+			var jsonResult = FindItem(name, fl);
+
+			if (jsonResult is null)
+			{
+				return null;
+			}
+
+			var (hashName, price) = jsonResult;
 
 			Console.WriteLine($"Hashname is {hashName}");
 
 			var result = await GetByHashName(hashName);
 			result.MarketPrice = price;
+			result.Float = fl;
 			return result;
 		}
 
@@ -55,39 +95,63 @@ namespace SteamBot.Services
 			using (var client = new WebClient())
 			{
 				img.Bytes = await client.DownloadDataTaskAsync(new Uri(item.Image));
-				await _context.Images.AddAsync(img);
 			}
-
-			var marketHashName = item.MarketHashName;
-
-			var isKnife = marketHashName.Contains(Helper.Star);
-			if (isKnife)
-			{
-				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
-			}
-
-			var isStatTrak = marketHashName.Contains(Helper.StatTrak);
-			if (isStatTrak)
-			{
-				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
-			}
-
-			var delimiterIndx = marketHashName.IndexOf('|');
-
-			var weapon = marketHashName[..delimiterIndx].Trim();
-			var skinName = marketHashName[(delimiterIndx + 2)..marketHashName.IndexOf('(')].Trim();
 
 			var result = new Item
 			{
-				Image = img,
-				IsKnife = isKnife,
-				IsStatTrak = isStatTrak,
-				WeaponName = weapon,
-				SkinName = skinName
+				Image = img
 			};
+			result.ParseHashName(hashName);
 			return result;
 		}
 
-		private record JsonItem(string Name, double Price);
+		public class JsonItem
+		{
+			public string Name { get; set; }
+			public double Price { get; set; }
+
+			public bool IsKnife => Name.Contains(Helper.Star);
+			public bool IsStatTrak => Name.Contains(Helper.StatTrak);
+
+			public string NormalizedName => Name.Replace(Helper.Star, String.Empty).Replace(Helper.StatTrak, String.Empty).Trim();
+
+			public string FullName => $"{WeaponName} | {SkinName}";
+
+			public string WeaponName
+			{
+				get
+				{
+					var delimiterIndx = NormalizedName.IndexOf('|');
+					return NormalizedName[..delimiterIndx].Trim();
+				}
+			}
+
+			public string SkinName
+			{
+				get
+				{
+					var delimiterIndx = NormalizedName.IndexOf('|');
+					return NormalizedName[(delimiterIndx + 2)..NormalizedName.IndexOf('(')].Trim();
+				}
+			}
+
+
+			public JsonItem(string name, double price)
+			{
+				Name = name;
+				Price = price;
+			}
+
+			public void Deconstruct(out string hashname, out double price)
+			{
+				hashname = Name;
+				price = Price;
+			}
+
+			public string ToMarkupString()
+			{
+				return $"*{Name}*\nPrice: {Price}$";
+			}
+		}
 	}
 }

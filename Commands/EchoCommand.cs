@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net.Mime;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SteamBot.Database;
 using SteamBot.Localization;
 using SteamBot.Model;
@@ -33,26 +41,94 @@ namespace SteamBot.Commands
 		public async Task<Response> Execute(IClient client)
 		{
 			var update = await client.GetUpdate();
-			//todo name from json
-			//todo float
+			var account = _context.GetAccount(update.Message);
+		
 			//todo price
-			await client.SendTextMessage(Texts.NewTradeText);
-			var message = await client.GetTextMessage();
+			//todo re-enter float
+			//todo image background
+			//todo fix locale bug
+			//todo 2 buttons with stattrak/no stattral
 
-			var account = _context.GetAccount(message);
 			while (true)
 			{
-				var item = await _steamService.GetItem(message.Text, 0.16f);
+				var item = await FindItem();
 
-				await using (MemoryStream stream = new(item.Image.Bytes))
+				await using MemoryStream stream = new(item.Image.Bytes);
+
+				var text = $"*{item.HashName}*\nPrice: {item.MarketPrice}$";
+				await client.SendPhoto(new InputOnlineFile(stream, "item.png"), caption: text, parseMode: ParseMode.Markdown);
+			}
+
+
+			async Task<Item> FindItem()
+			{
+				await client.SendTextMessage(Texts.NewTradeText);
+				var message = await client.GetTextMessage();
+				var fl = 0f;
+				while (true)
 				{
-					var text = $"*{item.HashName}*\nPrice: {item.MarketPrice}$";
-					await client.SendPhoto(new InputOnlineFile(stream, "item.png"), caption: text, parseMode: ParseMode.Markdown);
+					var items = _steamService.FindItems(message.Text).ToList();
+					Item result = default;
+
+					if (items.Count == 1)
+					{
+						var jsonItem = items[0];
+						await client.SendTextMessage("Этот предмет искали?\n" + jsonItem.ToMarkupString(), replyMarkup: Keys.ConfirmMarkup, parseMode: ParseMode.Markdown);
+
+						message = await client.GetTextMessage();
+
+						if (message.Text == Texts.YesBtn)
+						{
+							result = await SelectFloat(jsonItem);
+						}
+					}
+					else if (items.Count > 1)
+					{
+						ReplyKeyboardMarkup markup = items.Select(a => a.FullName).GroupElements(2).Select(a => a.ToArray()).ToArray();
+
+						markup.ResizeKeyboard = true;
+						markup.OneTimeKeyboard = true;
+						await client.SendTextMessage("Выберите скин короче)", replyMarkup: markup);
+						message = await client.GetTextMessage();
+
+						var selected = items.First(a => a.FullName == message.Text);
+						result = await SelectFloat(selected);
+					}
+
+					if (result != null)
+					{
+						return result;
+					}
+
+					await client.SendTextMessage("Ничего не найдено. Попробуйте еще раз");
+					message = await client.GetTextMessage();
 				}
 
-				message = await client.GetTextMessage();
+				async Task<Item> SelectFloat(SteamService.JsonItem jsonItem)
+				{
+					await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
+					
+					while (true)
+					{
+						message = await client.GetTextMessage();
+
+						if (Helper.TryGetFloatValue(message.Text, out fl, "ru-RU") || Single.TryParse(message.Text, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
+						{
+							var result = await _steamService.GetItem(jsonItem.FullName, fl);
+							if (result == null)
+							{
+								await client.SendTextMessage("Нет предмета с таким качеством.");
+								continue;
+							}
+
+							return result;
+						}
+
+						await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
+					}
+				}
 			}
-			
+
 
 			var trade = new Trade
 			{
@@ -61,6 +137,51 @@ namespace SteamBot.Commands
 			return new Response();
 		}
 	}
+
+	public static class Keys
+	{
+		public static ReplyKeyboardMarkup ConfirmMarkup
+		{
+			get
+			{
+				ReplyKeyboardMarkup result = new[]
+				{
+					Texts.YesBtn
+				};
+				result.ResizeKeyboard = true;
+				result.OneTimeKeyboard = true;
+				return result;
+			}
+		}
+
+		public static ReplyKeyboardMarkup FloatMarkup
+		{
+			get
+			{
+				ReplyKeyboardMarkup result = new[]
+				{
+					new[]
+					{
+						Texts.Float_Factory_New, Texts.Float_Minimal_Wear
+					},
+					new[]
+					{
+						Texts.Float_Field_Tested, Texts.Float_Well_Worn
+					},
+					new[]
+					{
+						Texts.Float_Battle_Scarred
+					}
+				};
+
+				result.ResizeKeyboard = true;
+				result.OneTimeKeyboard = true;
+
+				return result;
+			}
+		}
+	}
+
 
 	public class StartCommand : IStaticCommand
 	{

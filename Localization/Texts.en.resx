@@ -115,4 +115,22 @@
   <data name="MyTradesBtn" xml:space="preserve">
     <value>My Trades</value>
   </data>
+  <data name="YesBtn" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Float_Battle_Scarred" xml:space="preserve">
+    <value>Battle-Scarred</value>
+  </data>
+  <data name="Float_Factory_New" xml:space="preserve">
+    <value>Minimal Wear</value>
+  </data>
+  <data name="Float_Minimal_Wear" xml:space="preserve">
+    <value>Minimal Wear</value>
+  </data>
+  <data name="Float_Field_Tested" xml:space="preserve">
+    <value>Field-Tested</value>
+  </data>
+  <data name="Float_Well_Worn" xml:space="preserve">
+    <value>Well-Worn</value>
+  </data>
 </root>
