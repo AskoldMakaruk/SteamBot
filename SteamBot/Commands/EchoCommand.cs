@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using SteamBot.Database;
 using SteamBot.Localization;
 using SteamBot.Model;
@@ -42,12 +36,13 @@ namespace SteamBot.Commands
 		{
 			var update = await client.GetUpdate();
 			var account = _context.GetAccount(update.Message);
-		
+
 			//todo price
 			//todo re-enter float
 			//todo image background
 			//todo fix locale bug
 			//todo 2 buttons with stattrak/no stattral
+			ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
 
 			while (true)
 			{
@@ -107,7 +102,7 @@ namespace SteamBot.Commands
 				async Task<Item> SelectFloat(SteamService.JsonItem jsonItem)
 				{
 					await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
-					
+
 					while (true)
 					{
 						message = await client.GetTextMessage();

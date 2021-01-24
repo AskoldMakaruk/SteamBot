@@ -47,7 +47,7 @@ namespace SteamBot
 		{
 			floatName = floatName.Trim();
 			value = -1f;
-			Texts.Culture = CultureInfo.GetCultureInfo(culture);
+			///Texts.Culture = CultureInfo.GetCultureInfo(culture);
 			if (floatName == Texts.Float_Factory_New.Trim())
 			{
 				value = 0.6f;
@@ -72,7 +72,8 @@ namespace SteamBot
 			{
 				value = 0.99f;
 			}
-
+			//Texts.Culture = CultureInfo.DefaultThreadCurrentUICulture;
+			
 			return value > 0;
 		}
 
