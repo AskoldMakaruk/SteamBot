@@ -20,6 +20,20 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SteamApi\SteamApi.csproj" />
+
+    <Content Include="..\appsettings.Development.json">
+	    <Link>appsettings.Development.json</Link>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\appsettings.json">
+	    <Link>appsettings.json</Link>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\appsettings.Production.json">
+	    <Link>appsettings.Production.json</Link>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+
   </ItemGroup>
 
   <ItemGroup>
