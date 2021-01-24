@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BotFramework.Handlers;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Ninject.Modules;
 using Ninject.Parameters;
@@ -31,13 +33,31 @@ namespace SteamBot
 			//{
 			//	Console.WriteLine($"{child.Name}: {child.Value.Value<double>()}");
 			//}
+			var config = GetConfiguration();
 
-
-			new HandlerConfigurationBuilder("823973981:AAGYpq1Eyl_AAYGXLeW8s28uCH89S7fsHZA", typeof(Program).Assembly)
+			new HandlerConfigurationBuilder(config["BotToken"], typeof(Program).Assembly)
 				.UseConsoleDefaultLogger()
 				.WithCustomNinjectModules(new Injector())
 				.Build()
 				.RunInMemoryHandler();
+		}
+
+		public static IConfiguration GetConfiguration()
+		{
+			var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			env ??= "DEVELOPMENT";
+			env = env switch
+			{
+				"DEVELOPMENT" => "Development",
+				"PRODUCTION" => "Production",
+				"Release" => "Production"
+			};
+			string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+			return new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile($"{assemblyFolder}/appsettings.json", false, true)
+				.AddJsonFile($"{assemblyFolder}/appsettings.{env}.json", false, true)
+				.Build();
 		}
 	}
 
@@ -45,9 +65,11 @@ namespace SteamBot
 	{
 		public override void Load()
 		{
+			var config = Program.GetConfiguration();
 			Bind<TelegramContext>().To<TelegramContext>();
 			Bind<SteamService>().To<SteamService>();
-			Bind<SteamApiClient>().ToMethod(_ => new SteamApiClient("GBY60z2F65MOmMmqUUEnecpfb4A"));
+			Bind<SteamApiClient>().ToMethod(_ => new SteamApiClient(Program.GetConfiguration()["SteamApiToken"]));
+			Bind<IConfiguration>().ToMethod(_ => Program.GetConfiguration());
 		}
 	}
 }
