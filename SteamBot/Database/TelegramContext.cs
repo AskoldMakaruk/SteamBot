@@ -5,6 +5,7 @@ using Ninject.Activation;
 using SteamBot.Model;
 using Telegram.Bot.Types;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace SteamBot.Database
 {
@@ -14,10 +15,11 @@ namespace SteamBot.Database
 		public DbSet<Image> Images { get; set; }
 		public DbSet<Item> Items { get; set; }
 		public DbSet<Trade> Trades { get; set; }
-
+		
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseNpgsql("Host=64.227.79.234;Port=5432;Database=SteamBot;Username=askold;Password=139742685Aa");
+			var configuration = Program.GetConfiguration();
+			optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
 
 			base.OnConfiguring(optionsBuilder);
 		}

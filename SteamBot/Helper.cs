@@ -2,44 +2,45 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Resources;
 using SteamBot.Localization;
 
 namespace SteamBot
 {
 	public static class Helper
 	{
+		public static ResourceManager ResourceManager => Texts.ResourceManager;
 		public const string Star = "★";
 		public const string StatTrak = "StatTrak™";
 
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
-			Texts.Culture = CultureInfo.GetCultureInfo(culture);
-
+			var c = CultureInfo.GetCultureInfo(culture);
 			if (value >= 0 && value <= 0.07)
 			{
-				return Texts.Float_Factory_New;
+				return ResourceManager.GetString("Float_Factory_New", c);
 				return "Factory New";
 			}
 
 			if (value <= 0.15)
 			{
-				return Texts.Float_Minimal_Wear;
+				return ResourceManager.GetString("Float_Minimal_Wear", c);
 				return "Minimal Wear";
 			}
 
 			if (value <= 0.38)
 			{
-				return Texts.Float_Field_Tested;
+				return ResourceManager.GetString("Float_Field_Tested", c);
 				return "Field-Tested";
 			}
 
 			if (value <= 0.45)
 			{
-				return Texts.Float_Well_Worn;
+				return ResourceManager.GetString("Float_Well_Worn", c);
 				return "Well-Worn";
 			}
 
-			return Texts.Float_Battle_Scarred;
+			return ResourceManager.GetString("Float_Battle_Scarred", c);
 			return "Battle-Scarred";
 		}
 
@@ -47,33 +48,33 @@ namespace SteamBot
 		{
 			floatName = floatName.Trim();
 			value = -1f;
-			///Texts.Culture = CultureInfo.GetCultureInfo(culture);
-			if (floatName == Texts.Float_Factory_New.Trim())
+			var c = CultureInfo.GetCultureInfo(culture);
+			if (floatName == ResourceManager.GetString("Float_Factory_New", c)?.Trim())
 			{
-				value = 0.6f;
+				value = 0.06f;
 			}
 
-			if (floatName == Texts.Float_Minimal_Wear.Trim())
+			if (floatName == ResourceManager.GetString("Float_Minimal_Wear", c)?.Trim())
 			{
 				value = 0.14f;
 			}
 
-			if (floatName == Texts.Float_Field_Tested.Trim())
+			if (floatName == ResourceManager.GetString("Float_Field_Tested", c)?.Trim())
 			{
 				value = 0.37f;
 			}
 
-			if (floatName == Texts.Float_Well_Worn.Trim())
+			if (floatName == ResourceManager.GetString("Float_Well_Worn", c)?.Trim())
 			{
 				value = 0.44f;
 			}
 
-			if (floatName == Texts.Float_Battle_Scarred.Trim())
+			if (floatName == ResourceManager.GetString("Float_Battle_Scarred", c)?.Trim())
 			{
 				value = 0.99f;
 			}
 			//Texts.Culture = CultureInfo.DefaultThreadCurrentUICulture;
-			
+
 			return value > 0;
 		}
 

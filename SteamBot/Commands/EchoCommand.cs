@@ -38,32 +38,30 @@ namespace SteamBot.Commands
 			var account = _context.GetAccount(update.Message);
 
 			//todo price
-			//todo re-enter float
-			//todo image background
-			//todo fix locale bug
 			//todo 2 buttons with stattrak/no stattral
-			ProcessThreadCollection currentThreads = Process.GetCurrentProcess().Threads;
+			//todo image background
 
+			//todo fix locale bug
+			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
+			
+
+			//todo getInline
 			while (true)
 			{
-				var item = await FindItem();
-
-				await using MemoryStream stream = new(item.Image.Bytes);
-
-				var text = $"*{item.HashName}*\nPrice: {item.MarketPrice}$";
-				await client.SendPhoto(new InputOnlineFile(stream, "item.png"), caption: text, parseMode: ParseMode.Markdown);
+				await FindItem();
 			}
 
+		
 
-			async Task<Item> FindItem()
+			async Task FindItem()
 			{
 				await client.SendTextMessage(Texts.NewTradeText);
 				var message = await client.GetTextMessage();
-				var fl = 0f;
+
 				while (true)
 				{
 					var items = _steamService.FindItems(message.Text).ToList();
-					Item result = default;
+					//Item result = default;
 
 					if (items.Count == 1)
 					{
@@ -74,7 +72,7 @@ namespace SteamBot.Commands
 
 						if (message.Text == Texts.YesBtn)
 						{
-							result = await SelectFloat(jsonItem);
+							await SelectFloat(jsonItem);
 						}
 					}
 					else if (items.Count > 1)
@@ -87,43 +85,50 @@ namespace SteamBot.Commands
 						message = await client.GetTextMessage();
 
 						var selected = items.First(a => a.FullName == message.Text);
-						result = await SelectFloat(selected);
+						await SelectFloat(selected);
 					}
 
-					if (result != null)
-					{
-						return result;
-					}
+					//if (result != null)
+					//{
+					//	return result;
+					//}
 
 					await client.SendTextMessage("Ничего не найдено. Попробуйте еще раз");
 					message = await client.GetTextMessage();
 				}
+			}
 
-				async Task<Item> SelectFloat(SteamService.JsonItem jsonItem)
+			async Task SelectFloat(SteamService.JsonItem jsonItem)
+			{
+				await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
+
+				while (true)
 				{
-					await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
+					var message = await client.GetTextMessage();
 
-					while (true)
+					if (Helper.TryGetFloatValue(message.Text, out var fl, "ru-RU") || Single.TryParse(message.Text, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
 					{
-						message = await client.GetTextMessage();
-
-						if (Helper.TryGetFloatValue(message.Text, out fl, "ru-RU") || Single.TryParse(message.Text, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
+						var result = await _steamService.GetItem(jsonItem.FullName, fl);
+						if (result == null)
 						{
-							var result = await _steamService.GetItem(jsonItem.FullName, fl);
-							if (result == null)
-							{
-								await client.SendTextMessage("Нет предмета с таким качеством.");
-								continue;
-							}
-
-							return result;
+							await client.SendTextMessage("Нет предмета с таким качеством.");
+							continue;
 						}
 
-						await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
+						await SendItem(result);
 					}
+
+					await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup);
 				}
 			}
 
+			async Task SendItem(Item item)
+			{
+				await using MemoryStream stream = new(item.Image.Bytes);
+
+				var text = $"*{item.HashName}*\nPrice: {item.MarketPrice}$";
+				await client.SendPhoto(new InputOnlineFile(stream, "item.png"), caption: text, parseMode: ParseMode.Markdown);
+			}
 
 			var trade = new Trade
 			{
@@ -170,7 +175,6 @@ namespace SteamBot.Commands
 				};
 
 				result.ResizeKeyboard = true;
-				result.OneTimeKeyboard = true;
 
 				return result;
 			}
