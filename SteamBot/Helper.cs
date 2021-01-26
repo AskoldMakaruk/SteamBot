@@ -44,6 +44,27 @@ namespace SteamBot
 			return "Battle-Scarred";
 		}
 
+		public static string[] Floats
+		{
+			get
+			{
+				var c = CultureInfo.GetCultureInfo("en-EN");
+				return new[]
+				{
+					ResourceManager.GetString("Float_Factory_New", c),
+					ResourceManager.GetString("Float_Minimal_Wear", c),
+					ResourceManager.GetString("Float_Field_Tested", c),
+					ResourceManager.GetString("Float_Well_Worn", c),
+					ResourceManager.GetString("Float_Battle_Scarred", c)
+				};
+			}
+		}
+
+		public static bool IsFloated(string hashName)
+		{
+			return Floats.Any(hashName.Contains);
+		}
+
 		public static bool TryGetFloatValue(string floatName, out float value, string culture = "en-EN")
 		{
 			floatName = floatName.Trim();

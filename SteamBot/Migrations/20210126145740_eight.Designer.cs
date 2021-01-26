@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SteamBot.Database;
@@ -9,9 +10,10 @@ using SteamBot.Database;
 namespace SteamBot.Migrations
 {
     [DbContext(typeof(TelegramContext))]
-    partial class TelegramContextModelSnapshot : ModelSnapshot
+    [Migration("20210126145740_eight")]
+    partial class eight
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,7 +183,7 @@ namespace SteamBot.Migrations
                     b.HasIndex("SkinId")
                         .IsUnique();
 
-                    b.ToTable("SteamItems");
+                    b.ToTable("SteamItem");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Trade", b =>

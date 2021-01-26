@@ -48,7 +48,7 @@ namespace SteamBot.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("SteamBot.Model.Item", b =>
+            modelBuilder.Entity("SteamBot.Model.TradeItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +60,7 @@ namespace SteamBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Item");
+                    b.ToTable("TradeItem");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Trade", b =>
@@ -102,7 +102,7 @@ namespace SteamBot.Migrations
                         .WithMany()
                         .HasForeignKey("BuyerId");
 
-                    b.HasOne("SteamBot.Model.Item", "Item")
+                    b.HasOne("SteamBot.Model.TradeItem", "TradeItem")
                         .WithMany()
                         .HasForeignKey("ItemId");
 
@@ -112,7 +112,7 @@ namespace SteamBot.Migrations
 
                     b.Navigation("Buyer");
 
-                    b.Navigation("Item");
+                    b.Navigation("TradeItem");
 
                     b.Navigation("Seller");
                 });

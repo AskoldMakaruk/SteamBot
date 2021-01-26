@@ -26,14 +26,14 @@ namespace SteamBot.Migrations
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Item",
-                table: "Item");
+                table: "TradeItem");
 
             migrationBuilder.RenameTable(
                 name: "Trade",
                 newName: "Trades");
 
             migrationBuilder.RenameTable(
-                name: "Item",
+                name: "TradeItem",
                 newName: "Items");
 
             migrationBuilder.RenameIndex(
@@ -243,7 +243,7 @@ namespace SteamBot.Migrations
 
             migrationBuilder.RenameTable(
                 name: "Items",
-                newName: "Item");
+                newName: "TradeItem");
 
             migrationBuilder.RenameIndex(
                 name: "IX_Trades_SellerId",
@@ -262,7 +262,7 @@ namespace SteamBot.Migrations
 
             migrationBuilder.RenameColumn(
                 name: "WeaponName",
-                table: "Item",
+                table: "TradeItem",
                 newName: "Name");
 
             migrationBuilder.AddPrimaryKey(
@@ -272,7 +272,7 @@ namespace SteamBot.Migrations
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Item",
-                table: "Item",
+                table: "TradeItem",
                 column: "Id");
 
             migrationBuilder.AddForeignKey(
@@ -295,7 +295,7 @@ namespace SteamBot.Migrations
                 name: "FK_Trade_Item_ItemId",
                 table: "Trade",
                 column: "ItemId",
-                principalTable: "Item",
+                principalTable: "TradeItem",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
         }

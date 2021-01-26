@@ -7,8 +7,11 @@ using System.Linq;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SteamApi;
+using SteamApi.Model;
 using SteamBot.Database;
 using SteamBot.Model;
 
@@ -38,77 +41,115 @@ namespace SteamBot.Services
 			_context = context;
 		}
 
-		public IEnumerable<JsonItem> FindItems(string name)
+		public async Task UpdateDb()
 		{
-			bool Compare(JsonItem a)
+			var skins = _context.Skins.ToList();
+			foreach (var group in Bag.GroupBy(a => new {a.SkinName, a.WeaponName}))
 			{
-				var hashName = a.Name.ToLower().Trim();
-				return hashName.Contains(name.ToLower().Trim());
-			}
-
-			return Bag.Where(Compare).DistinctBy(a => new {a.WeaponName, a.SkinName});
-		}
-
-		public JsonItem FindItem(string name, float fl)
-		{
-			bool Compare(JsonItem a)
-			{
-				var hashName = a.Name.ToLower().Trim();
-				var result = hashName.Contains(name.ToLower().Trim()) && hashName.Contains(Helper.GetFloatName(fl).ToLower().Trim());
-				if (result)
+				try
 				{
-					Console.WriteLine(hashName);
-					
+					var item = skins.FirstOrDefault(a => a.WeaponName == group.Key.WeaponName && a.SkinName == group.Key.SkinName);
+
+					var first = group.First();
+					if (item == null)
+					{
+						item = new Skin();
+						item.ParseHashName(first.Name);
+						await _context.Skins.AddAsync(item);
+					}
+					else
+					{
+						item.ParseHashName(first.Name);
+					}
+
+					if (!first.IsFloated)
+					{
+						item.Price = first.Price;
+					}
+					else
+					{
+						var battleScarred = group.FirstOrDefault(a => a.Name.Contains("Battle-Scarred"));
+						var factoryNew = group.FirstOrDefault(a => a.Name.Contains("Factory New"));
+						var fieldTested = group.FirstOrDefault(a => a.Name.Contains("Field-Tested"));
+						var minimalWear = group.FirstOrDefault(a => a.Name.Contains("Minimal Wear"));
+						var wellWorn = group.FirstOrDefault(a => a.Name.Contains("Well-Worn"));
+
+						item.BattleScarredPrice = battleScarred?.Price;
+						item.FactoryNewPrice = factoryNew?.Price;
+						item.FieldTestedPrice = fieldTested?.Price;
+						item.MinimalWearPrice = minimalWear?.Price;
+						item.WellWornPrice = wellWorn?.Price;
+					}
 				}
-
-				return result;
+				catch (Exception e)
+				{
+					Console.WriteLine(group.Key);
+				}
 			}
 
-			return Bag.FirstOrDefault(Compare);
+			await _context.SaveChangesAsync();
 		}
 
-		public async Task<Item> GetItem(string name, float fl)
+		public IEnumerable<Skin> FindItems(string name)
 		{
-			Console.WriteLine($"Trying to get item with name {name} float: {fl} ({Helper.GetFloatName(fl)})");
-
-			var jsonResult = FindItem(name, fl);
-
-			if (jsonResult is null)
-			{
-				return null;
-			}
-
-			var (hashName, price) = jsonResult;
-
-			Console.WriteLine($"Hashname is {hashName}");
-
-			var result = await GetByHashName(hashName);
-			result.MarketPrice = price;
-			result.Float = fl;
-			return result;
+			return _context.Skins.Where(skin => skin.SearchName.ToLower().Contains(name.Trim().ToLower()));
 		}
 
-		public async Task<Item> GetByHashName(string hashName)
+		//public async Task<TradeItem> GetItem(string name, float fl)
+		//{
+		//	Console.WriteLine($"Trying to get item with name {name} float: {fl} ({Helper.GetFloatName(fl)})");
+
+		//	var jsonResult = FindItems(name).FirstOrDefault();
+
+		//	if (jsonResult is null)
+		//	{
+		//		return null;
+		//	}
+
+		//	var hashName = jsonResult.GetHashName(fl);
+
+		//	Console.WriteLine($"Hashname is {hashName}");
+
+		//	var result = await GetSteamItem(hashName);
+		//	result.Float = fl;
+		//	return result;
+		//}
+
+		public async Task<Item> GetSteamItem(Skin skin, float fl)
 		{
-			var item = await _client.GetCSGOItem(hashName);
-			var img = new Image();
-			using (var client = new WebClient())
+			Item item;
+
+			if (skin.SteamItem != null)
 			{
-				img.Bytes = await client.DownloadDataTaskAsync(new Uri(item.Image));
+				item = JsonConvert.DeserializeObject<Item>(skin.SteamItem.Json);
+			}
+			else
+			{
+				item = await _client.GetCSGOItem(skin.GetHashName(fl));
+
+				skin.SteamItem = new SteamItem
+				{
+					Json = JsonConvert.SerializeObject(item),
+					Skin = skin,
+				};
+				await _context.SteamItems.AddAsync(skin.SteamItem);
 			}
 
-			var result = new Item
-			{
-				Image = img
-			};
-			result.ParseHashName(hashName);
-			return result;
+			//todo update price
+
+			await _context.GetImage(skin, fl, item.Image);
+			await _context.SaveChangesAsync();
+
+			return item;
 		}
+
 
 		public class JsonItem
 		{
 			public string Name { get; set; }
 			public double Price { get; set; }
+			public bool IsFloated => Helper.IsFloated(Name);
+			public bool HasDelimiter => Name.Contains('|');
 
 			public bool IsKnife => Name.Contains(Helper.Star);
 			public bool IsStatTrak => Name.Contains(Helper.StatTrak);
@@ -121,8 +162,14 @@ namespace SteamBot.Services
 			{
 				get
 				{
-					var delimiterIndx = NormalizedName.IndexOf('|');
-					return NormalizedName[..delimiterIndx].Trim();
+					return Skin.GetNormalizedName(Name).WeaponName;
+					if (HasDelimiter)
+					{
+						var delimiterIndx = NormalizedName.IndexOf('|');
+						return NormalizedName[..delimiterIndx].Trim();
+					}
+
+					return Name.Trim();
 				}
 			}
 
@@ -130,8 +177,15 @@ namespace SteamBot.Services
 			{
 				get
 				{
-					var delimiterIndx = NormalizedName.IndexOf('|');
-					return NormalizedName[(delimiterIndx + 2)..NormalizedName.IndexOf('(')].Trim();
+					return Skin.GetNormalizedName(Name).SkinName;
+					if (HasDelimiter)
+					{
+						var delimiterIndx = NormalizedName.IndexOf('|');
+
+						return (IsFloated ? NormalizedName[(delimiterIndx + 2)..NormalizedName.IndexOf('(')] : NormalizedName[(delimiterIndx + 2)..]).Trim();
+					}
+
+					return WeaponName;
 				}
 			}
 

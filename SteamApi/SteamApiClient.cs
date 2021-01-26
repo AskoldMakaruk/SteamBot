@@ -37,7 +37,7 @@ namespace SteamApi
 		public async Task<Item> GetItem(string appId, string itemHashName)
 		{
 			
-			var response = await client.GetAsync($"{Utils.Item}/{appId}/{itemHashName}?api_key={Token}");
+			var response = await client.GetAsync($"{Utils.Item}/{appId}/{itemHashName.Trim()}?api_key={Token}");
 
 			if (!response.IsSuccessStatusCode)
 			{

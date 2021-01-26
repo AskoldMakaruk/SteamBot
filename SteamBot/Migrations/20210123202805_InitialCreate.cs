@@ -25,7 +25,7 @@ namespace SteamBot.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Item",
+                name: "TradeItem",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -67,7 +67,7 @@ namespace SteamBot.Migrations
                     table.ForeignKey(
                         name: "FK_Trade_Item_ItemId",
                         column: x => x.ItemId,
-                        principalTable: "Item",
+                        principalTable: "TradeItem",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -97,7 +97,7 @@ namespace SteamBot.Migrations
                 name: "Accounts");
 
             migrationBuilder.DropTable(
-                name: "Item");
+                name: "TradeItem");
         }
     }
 }

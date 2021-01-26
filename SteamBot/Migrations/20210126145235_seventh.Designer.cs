@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SteamBot.Database;
@@ -9,9 +10,10 @@ using SteamBot.Database;
 namespace SteamBot.Migrations
 {
     [DbContext(typeof(TelegramContext))]
-    partial class TelegramContextModelSnapshot : ModelSnapshot
+    [Migration("20210126145235_seventh")]
+    partial class seventh
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,6 +160,9 @@ namespace SteamBot.Migrations
 
                     b.HasIndex("MinimalWearImageId");
 
+                    b.HasIndex("SteamItemId")
+                        .IsUnique();
+
                     b.HasIndex("WellWornImageId");
 
                     b.ToTable("Skins");
@@ -173,15 +178,11 @@ namespace SteamBot.Migrations
                     b.Property<string>("Json")
                         .HasColumnType("text");
 
-                    b.Property<int>("SkinId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SkinId")
-                        .IsUnique();
+                    b.HasIndex("Id");
 
-                    b.ToTable("SteamItems");
+                    b.ToTable("SteamItem");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Trade", b =>
@@ -262,6 +263,12 @@ namespace SteamBot.Migrations
                         .WithMany()
                         .HasForeignKey("MinimalWearImageId");
 
+                    b.HasOne("SteamBot.Model.SteamItem", "SteamItem")
+                        .WithOne("Skin")
+                        .HasForeignKey("SteamBot.Model.Skin", "SteamItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SteamBot.Model.Image", "WellWornImage")
                         .WithMany()
                         .HasForeignKey("WellWornImageId");
@@ -276,18 +283,9 @@ namespace SteamBot.Migrations
 
                     b.Navigation("MinimalWearImage");
 
+                    b.Navigation("SteamItem");
+
                     b.Navigation("WellWornImage");
-                });
-
-            modelBuilder.Entity("SteamBot.Model.SteamItem", b =>
-                {
-                    b.HasOne("SteamBot.Model.Skin", "Skin")
-                        .WithOne("SteamItem")
-                        .HasForeignKey("SteamBot.Model.SteamItem", "SkinId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Skin");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Trade", b =>
@@ -327,9 +325,12 @@ namespace SteamBot.Migrations
 
             modelBuilder.Entity("SteamBot.Model.Skin", b =>
                 {
-                    b.Navigation("SteamItem");
-
                     b.Navigation("TradeItems");
+                });
+
+            modelBuilder.Entity("SteamBot.Model.SteamItem", b =>
+                {
+                    b.Navigation("Skin");
                 });
 #pragma warning restore 612, 618
         }
