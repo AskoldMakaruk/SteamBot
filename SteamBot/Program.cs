@@ -32,12 +32,12 @@ namespace SteamBot
 			//	Console.WriteLine($"{child.Name}: {child.Value.Value<double>()}");
 			//}
 
-			var st = Stopwatch.StartNew();
-			var kernel = new StandardKernel(new Injector());
-			var steamService = kernel.Get<SteamService>();
-			steamService.UpdateDb().Wait();
-			Console.WriteLine(st.Elapsed);
-
+			//var st = Stopwatch.StartNew();
+			//var kernel = new StandardKernel(new Injector());
+			//var steamService = kernel.Get<SteamService>();
+			//steamService.UpdateDb().Wait();
+			//Console.WriteLine(st.Elapsed);
+			
 			var config = GetConfiguration();
 
 			new HandlerConfigurationBuilder(config["BotToken"], typeof(Program).Assembly)

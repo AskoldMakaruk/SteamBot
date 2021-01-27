@@ -1,9 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Resources;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using BotFramework.Clients;
+using BotFramework.Clients.ClientExtensions;
+using SteamBot.Commands;
 using SteamBot.Localization;
+using SteamBot.Model;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 
 namespace SteamBot
 {
@@ -12,6 +22,11 @@ namespace SteamBot
 		public static ResourceManager ResourceManager => Texts.ResourceManager;
 		public const string Star = "★";
 		public const string StatTrak = "StatTrak™";
+
+		public static async Task<CallbackQuery> GetCallbackQuery(this IClient client)
+		{
+			return (await client.GetUpdate(a => a.CallbackQuery != null)).CallbackQuery;
+		}
 
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
@@ -44,25 +59,22 @@ namespace SteamBot
 			return "Battle-Scarred";
 		}
 
-		public static string[] Floats
+		public static string[] Floats(string culture  = "en-EN")
 		{
-			get
+			var c = CultureInfo.GetCultureInfo(culture);
+			return new[]
 			{
-				var c = CultureInfo.GetCultureInfo("en-EN");
-				return new[]
-				{
-					ResourceManager.GetString("Float_Factory_New", c),
-					ResourceManager.GetString("Float_Minimal_Wear", c),
-					ResourceManager.GetString("Float_Field_Tested", c),
-					ResourceManager.GetString("Float_Well_Worn", c),
-					ResourceManager.GetString("Float_Battle_Scarred", c)
-				};
-			}
+				ResourceManager.GetString("Float_Factory_New", c),
+				ResourceManager.GetString("Float_Minimal_Wear", c),
+				ResourceManager.GetString("Float_Field_Tested", c),
+				ResourceManager.GetString("Float_Well_Worn", c),
+				ResourceManager.GetString("Float_Battle_Scarred", c)
+			};
 		}
 
 		public static bool IsFloated(string hashName)
 		{
-			return Floats.Any(hashName.Contains);
+			return Floats().Any(hashName.Contains);
 		}
 
 		public static bool TryGetFloatValue(string floatName, out float value, string culture = "en-EN")
@@ -94,7 +106,6 @@ namespace SteamBot
 			{
 				value = 0.99f;
 			}
-			//Texts.Culture = CultureInfo.DefaultThreadCurrentUICulture;
 
 			return value > 0;
 		}

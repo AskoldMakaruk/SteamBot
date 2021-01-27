@@ -8,6 +8,7 @@ using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
+using Npgsql.Replication;
 using SteamBot.Database;
 using SteamBot.Localization;
 using SteamBot.Model;
@@ -30,14 +31,12 @@ namespace SteamBot.Commands
 			_steamService = steamService;
 		}
 
-		public bool SuitableFirst(Update message) => message?.Message?.Text == Texts.NewTradeBtn;
+		public bool SuitableLast(Update message) => message?.Message?.Text != null; // == Texts.NewTradeBtn;
 
 		public async Task<Response> Execute(IClient client)
 		{
-			var update = await client.GetUpdate();
-			var account = _context.GetAccount(update.Message);
-
-			//todo fix float for !IsFloated
+			//var update = await client.GetUpdate();
+			//var account = _context.GetAccount(update.Message);
 
 			//todo float from inline
 			//todo 2 buttons with stattrak/no stattral
@@ -58,7 +57,7 @@ namespace SteamBot.Commands
 
 			async Task FindItem()
 			{
-				await client.SendTextMessage(Texts.NewTradeText);
+				//await client.SendTextMessage(Texts.NewTradeText);
 				var message = await client.GetTextMessage();
 
 				while (true)
@@ -69,20 +68,20 @@ namespace SteamBot.Commands
 					if (skins.Count == 1)
 					{
 						var skin = skins[0];
-						await SendItem(skin);
+						await SendSkin(client, skin);
 						message = await client.GetTextMessage();
 						continue;
-						await client.SendTextMessage("Этот предмет искали?\n" + skin.ToMarkupString(), replyMarkup: Keys.ConfirmMarkup, parseMode: ParseMode.Markdown);
+						//await client.SendTextMessage("Этот предмет искали?\n" + skin.ToMarkupString(), replyMarkup: Keys.ConfirmMarkup, parseMode: ParseMode.Markdown);
 
-						
 
-						if (message.Text == Texts.YesBtn)
-						{
-							await SelectFloat(skin);
-							continue;
-						}
+						//if (message.Text == Texts.YesBtn)
+						//{
+						//	await SelectFloat(skin);
+						//	continue;
+						//}
 					}
-					else if (skins.Count > 1)
+
+					if (skins.Count > 1)
 					{
 						ReplyKeyboardMarkup markup = skins.Select(a => a.SearchName).GroupElements(2).Select(a => a.ToArray()).ToArray();
 
@@ -104,155 +103,99 @@ namespace SteamBot.Commands
 			async Task SelectFloat(Skin skin)
 			{
 				//if (!skin.IsFloated)
-				{
-					await SendItem(skin);
-					return;
-				}
+				//{
+				//	await SendItem(skin);
+				//	return;
+				//}
 
 				//await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
 
 				//while (true)
 				//{
 				//	var message = await client.GetTextMessage();
-
-				//	if (Helper.TryGetFloatValue(message.Text, out var fl, "ru-RU") || Single.TryParse(message.Text, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
-				//	{
-				//		if (skin.GetMarketPrice(fl) == null)
-				//		{
-				//			await client.SendTextMessage("Нет предмета с таким качеством.");
-				//			continue;
-				//		}
-
-				//		await SendItem(skin, fl);
-				//	}
-
-				//	await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: );
-				//}
 			}
 
-			async Task SendItem(Skin skin, float fl = default)
-			{
-				string price = "";
-				if (fl == 0)
-				{
-					var prices = skin.GetPrices();
-					price = $"{prices.Min():0.##}$ - {prices.Max():0.##}$";
-				}
-				else
-				{
-					price = $"{skin.GetMarketPrice(fl)}$";
-				}
-
-				if (skin.IsFloated && fl == 0)
-				{
-					Helper.TryGetFloatValue(skin.GetFloats("en-EN").First(), out fl);
-				}
-				var image = await _context.GetImage(skin, fl);
-				if (image == null)
-				{
-					await _steamService.GetSteamItem(skin, fl);
-					image = skin.GetImage(fl);
-				}
-
-				await using MemoryStream stream = new(image.Bytes);
-
-				
-				var text = $"*{skin.SearchName}*\nPrice: {price}";
-				await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
-			}
-
-			var trade = new Trade
-			{
-				Seller = account
-			};
+			//var trade = new Trade
+			//{
+			//	Seller = account
+			//};
 			return new Response();
 		}
-	}
 
-	public static class Keys
-	{
-		public static ReplyKeyboardMarkup ConfirmMarkup
+		public async Task<Message> SendSkin(IClient client, Skin skin, float fl = default)
 		{
-			get
+			string price = "";
+			if (fl == 0)
 			{
-				ReplyKeyboardMarkup result = new[]
-				{
-					Texts.YesBtn
-				};
-				result.ResizeKeyboard = true;
-				result.OneTimeKeyboard = true;
-				return result;
+				var prices = skin.GetPrices();
+				price = $"{prices.Min().ToString("F", CultureInfo.InvariantCulture)}$ - {prices.Max().ToString("F", CultureInfo.InvariantCulture)}$";
 			}
-		}
-
-		public static IReplyMarkup FloatMarkup(Skin skin, string culture)
-		{
-			if (!skin.IsFloated)
+			else
 			{
-				return null;
+				price = $"{skin.GetMarketPrice(fl)?.ToString("C2", CultureInfo.InvariantCulture)}$";
 			}
 
-			var result = new InlineKeyboardMarkup(skin.GetFloats(culture)
-				.GroupElements(2)
-				.Select(a => a.Select(c => new InlineKeyboardButton
-					{
-						CallbackData = $"{skin.Id} {c}",
-						Text = c
-					})
-				));
+			if (skin.IsFloated && fl == 0)
+			{
+				Helper.TryGetFloatValue(skin.GetFloats("en-EN").First(), out fl);
+			}
 
-			return result;
+			var image = await _context.GetImage(skin, fl);
+			if (image == null)
+			{
+				await _steamService.GetSteamItem(skin, fl);
+				image = skin.GetImage(fl);
+			}
+
+			await using MemoryStream stream = new(image.Bytes);
+
+
+			var text = $"*{skin.SearchName}*\nPrice: {price}";
+			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
 		}
 	}
 
 
-	public class StartCommand : IStaticCommand
+	//todo
+	public class FloatInlineCommand : IStaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly SteamService _steamService;
 
-		public StartCommand(TelegramContext context)
+		public FloatInlineCommand(SteamService steamService)
 		{
-			_context = context;
+			_steamService = steamService;
 		}
 
-		public bool SuitableFirst(Update message) => message?.Message?.Text == "/start";
+		public bool SuitableLast(Update message) => Helper.Floats().Any(a => message?.CallbackQuery?.Data.Contains(a) ?? false);
 
 		public async Task<Response> Execute(IClient client)
 		{
-			var update = await client.GetUpdate();
-			var account = _context.GetAccount(update.Message);
-			if (account.TradeUrl is null)
-			{
-				await client.SendTextMessage(Texts.EnterTradeUrlText, disableWebPagePreview: true, parseMode: ParseMode.Markdown);
-				var message = await client.GetTextMessage();
+			var query = await client.GetCallbackQuery();
+			var skin = _steamService.FindItems(query.Message.Caption.Split('\n')[0]).First();
 
-				while (!Uri.IsWellFormedUriString(message.Text, UriKind.Absolute))
+			var floatString = query.Data[query.Data.IndexOf(' ')..];
+			if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
+			{
+				if (skin.GetMarketPrice(fl) == null)
 				{
-					await client.SendTextMessage(Texts.EnterUrlText);
-					message = await client.GetTextMessage();
+					await client.SendTextMessage("Нет предмета с таким качеством.");
 				}
 
-				account.TradeUrl = message.Text;
-				await _context.SaveChangesAsync();
+				var price = skin.GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
+				var text = $"*{skin.SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}";
+
+				//todo edit message?
+				if (query.InlineMessageId != null)
+				{
+					await client.EditMessageCaption(query.InlineMessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
+				}
+				else
+				{
+					await client.EditMessageCaption(query.Message.MessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
+				}
 			}
 
-			ReplyKeyboardMarkup startkeys = new[]
-			{
-				new[]
-				{
-					Texts.NewTradeBtn,
-					Texts.MyTradesBtn
-				},
-				new[]
-				{
-					Texts.MyMoneyBtn,
-					Texts.MyStats
-				}
-			};
-			startkeys.ResizeKeyboard = true;
-
-			await client.SendTextMessage(Texts.StartText, replyMarkup: startkeys);
-
+			//await client.SendTextMessage(Texts.EnterFloatText, replyMarkup:);
 			return new Response();
 		}
 	}

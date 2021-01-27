@@ -21,19 +21,7 @@ namespace SteamBot.Services
 	{
 		private readonly SteamApiClient _client;
 		private readonly TelegramContext _context;
-		private static ConcurrentBag<JsonItem> Bag;
-
-		static SteamService()
-		{
-			var json = File.ReadAllText("compact.json");
-			var jobject = JObject.Parse(json);
-			var list = jobject.Children()
-				.OfType<JProperty>()
-				.Select(a => new JsonItem(a.Name, a.Value.Value<double>()))
-				.ToList();
-
-			Bag = new ConcurrentBag<JsonItem>(list);
-		}
+		
 
 		public SteamService(SteamApiClient client, TelegramContext context)
 		{
@@ -41,7 +29,7 @@ namespace SteamBot.Services
 			_context = context;
 		}
 
-		public async Task UpdateDb()
+		public async Task UpdateDb(IEnumerable<JsonItem> Bag)
 		{
 			var skins = _context.Skins.ToList();
 			foreach (var group in Bag.GroupBy(a => new {a.SkinName, a.WeaponName}))
