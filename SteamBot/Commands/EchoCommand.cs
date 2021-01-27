@@ -35,90 +35,38 @@ namespace SteamBot.Commands
 
 		public async Task<Response> Execute(IClient client)
 		{
-			//var update = await client.GetUpdate();
-			//var account = _context.GetAccount(update.Message);
-
-			//todo float from inline
 			//todo 2 buttons with stattrak/no stattral
 			//todo price
-
 			//todo image background
-
-			//todo fix locale bug
 			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
 
-
-			//todo getInline
+			var message = await client.GetTextMessage();
 			while (true)
 			{
-				await FindItem();
-			}
+				var skins = _steamService.FindItems(message.Text).ToList();
 
-
-			async Task FindItem()
-			{
-				//await client.SendTextMessage(Texts.NewTradeText);
-				var message = await client.GetTextMessage();
-
-				while (true)
+				if (skins.Count == 1)
 				{
-					var skins = _steamService.FindItems(message.Text).ToList();
-					//TradeItem result = default;
-
-					if (skins.Count == 1)
-					{
-						var skin = skins[0];
-						await SendSkin(client, skin);
-						message = await client.GetTextMessage();
-						continue;
-						//await client.SendTextMessage("Этот предмет искали?\n" + skin.ToMarkupString(), replyMarkup: Keys.ConfirmMarkup, parseMode: ParseMode.Markdown);
-
-
-						//if (message.Text == Texts.YesBtn)
-						//{
-						//	await SelectFloat(skin);
-						//	continue;
-						//}
-					}
-
-					if (skins.Count > 1)
-					{
-						ReplyKeyboardMarkup markup = skins.Select(a => a.SearchName).GroupElements(2).Select(a => a.ToArray()).ToArray();
-
-						markup.ResizeKeyboard = true;
-						markup.OneTimeKeyboard = true;
-						await client.SendTextMessage("Выберите скин короче)", replyMarkup: markup);
-						message = await client.GetTextMessage();
-
-						//var selected = skins.First(a => a.SearchName == message.Text);
-						//await SelectFloat(selected);
-						continue;
-					}
-
-					await client.SendTextMessage("Ничего не найдено. Попробуйте еще раз");
-					message = await client.GetTextMessage();
+					var skin = skins[0];
+					await SendSkin(client, skin);
 				}
+				else if (skins.Count > 1)
+				{
+					ReplyKeyboardMarkup markup = skins.Select(a => a.SearchName).GroupElements(2).Select(a => a.ToArray()).ToArray();
+
+					markup.ResizeKeyboard = true;
+					markup.OneTimeKeyboard = true;
+					await client.SendTextMessage("Выберите скин короче)", replyMarkup: markup);
+				}
+				else
+				{
+					await client.SendTextMessage("Ничего не найдено. Попробуйте еще раз");
+				}
+
+				message = await client.GetTextMessage();
 			}
 
-			async Task SelectFloat(Skin skin)
-			{
-				//if (!skin.IsFloated)
-				//{
-				//	await SendItem(skin);
-				//	return;
-				//}
 
-				//await client.SendTextMessage(Texts.EnterFloatText, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
-
-				//while (true)
-				//{
-				//	var message = await client.GetTextMessage();
-			}
-
-			//var trade = new Trade
-			//{
-			//	Seller = account
-			//};
 			return new Response();
 		}
 
@@ -156,7 +104,6 @@ namespace SteamBot.Commands
 	}
 
 
-	//todo
 	public class FloatInlineCommand : IStaticCommand
 	{
 		private readonly SteamService _steamService;
@@ -178,13 +125,13 @@ namespace SteamBot.Commands
 			{
 				if (skin.GetMarketPrice(fl) == null)
 				{
-					await client.SendTextMessage("Нет предмета с таким качеством.");
+					await client.AnswerCallbackQuery("Нет предмета с таким качеством.");
 				}
 
 				var price = skin.GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
 				var text = $"*{skin.SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}";
 
-				//todo edit message?
+				//todo edit image?
 				if (query.InlineMessageId != null)
 				{
 					await client.EditMessageCaption(query.InlineMessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
@@ -195,7 +142,6 @@ namespace SteamBot.Commands
 				}
 			}
 
-			//await client.SendTextMessage(Texts.EnterFloatText, replyMarkup:);
 			return new Response();
 		}
 	}
