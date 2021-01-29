@@ -165,4 +165,10 @@
   <data name="Float_Battle_Scarred" xml:space="preserve">
     <value>Закаленное в боях</value>
   </data>
+  <data name="EnterPrice" xml:space="preserve">
+    <value>Введите цену:</value>
+  </data>
+  <data name="TradeCreated" xml:space="preserve">
+    <value>Сделка создана.</value>
+  </data>
 </root>

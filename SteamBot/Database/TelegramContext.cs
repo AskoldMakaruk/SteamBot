@@ -34,6 +34,9 @@ namespace SteamBot.Database
 			{
 				builder.HasMany(a => a.Trades)
 					.WithOne(a => a.Seller);
+
+				builder.HasMany(a => a.Buys)
+					.WithOne(a => a.Buyer);
 			});
 
 			modelBuilder.Entity<Skin>(builder =>
@@ -92,28 +95,31 @@ namespace SteamBot.Database
 			return cachedAccount as Account;
 		}
 
-		public Account GetAccount(Message message)
+		public Account GetAccount(User user)
 		{
-			var result = GetAccount(message.From.Id);
+			var result = GetAccount(user.Id);
 			if (result != null)
 				return result;
 
-			var account = Accounts.FirstOrDefault(a => a.ChatId == message.From.Id) ?? CreateAccount(message);
+			var account = Accounts.FirstOrDefault(a => a.ChatId == user.Id) ?? CreateAccount(user);
 
-			cache.Set((long) message.From.Id, account, DefaultCacheOffset);
+			cache.Set((long)user.Id, account, DefaultCacheOffset);
 
 			return account;
 		}
 
-		private Account CreateAccount(Message message)
+		public Account GetAccount(Message message) => GetAccount(message.From);
+		
+
+		private Account CreateAccount(User user)
 		{
 			var account = new Account
 			{
-				ChatId = message.Chat.Id,
-				Username = message.Chat.Username
+				ChatId = user.Id,
+				Username = user.Username
 			};
-			if (message.Chat.Username == null)
-				account.Username = message.Chat.FirstName + " " + message.Chat.LastName;
+			if (user.Username == null)
+				account.Username = user.FirstName + " " + user.LastName;
 			Accounts.Add(account);
 			SaveChanges();
 			return account;

@@ -113,7 +113,7 @@
     <value>My Stats</value>
   </data>
   <data name="MyTradesBtn" xml:space="preserve">
-    <value>My Trades</value>
+    <value>My Sales</value>
   </data>
   <data name="YesBtn" xml:space="preserve">
     <value>Yes</value>
@@ -132,5 +132,8 @@
   </data>
   <data name="Float_Well_Worn" xml:space="preserve">
     <value>Well-Worn</value>
+  </data>
+  <data name="EnterPrice" xml:space="preserve">
+    <value>Enter price:</value>
   </data>
 </root>

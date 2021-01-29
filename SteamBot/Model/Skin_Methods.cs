@@ -203,7 +203,7 @@ namespace SteamBot.Model
 		public string ToMessage(float fl = default)
 		{
 			var price = GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
-			return $"*{SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}";
+			return $"*{SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}$";
 		}
 
 		public static Skin FromMessage()
@@ -218,29 +218,29 @@ namespace SteamBot.Model
 			var resourceManager = Texts.ResourceManager;
 			var c = CultureInfo.GetCultureInfo(culture);
 
-			if (BattleScarredPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Battle_Scarred", c));
-			}
-
 			if (FactoryNewPrice != null)
 			{
 				result.Add(resourceManager.GetString("Float_Factory_New", c));
-			}
-
-			if (FieldTestedPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Field_Tested", c));
 			}
 
 			if (MinimalWearPrice != null)
 			{
 				result.Add(resourceManager.GetString("Float_Minimal_Wear", c));
 			}
+			
+			if (FieldTestedPrice != null)
+			{
+				result.Add(resourceManager.GetString("Float_Field_Tested", c));
+			}
 
 			if (WellWornPrice != null)
 			{
 				result.Add(resourceManager.GetString("Float_Well_Worn", c));
+			}
+
+			if (BattleScarredPrice != null)
+			{
+				result.Add(resourceManager.GetString("Float_Battle_Scarred", c));
 			}
 
 			return result;

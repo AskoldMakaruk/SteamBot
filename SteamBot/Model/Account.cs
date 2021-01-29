@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SteamBot.Model
 {
@@ -14,6 +15,10 @@ namespace SteamBot.Model
 		public virtual bool IsAdmin { get; set; }
 
 		public virtual ICollection<Trade> Trades { get; set; }
+		public virtual ICollection<Trade> Buys { get; set; }
+
+		[NotMapped]
+		public TradeItem CurrentTrade { get; set; }
 	}
 
 	public class Trade

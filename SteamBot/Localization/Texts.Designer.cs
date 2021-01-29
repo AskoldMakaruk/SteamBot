@@ -79,6 +79,15 @@ namespace SteamBot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Введите цену:.
+        /// </summary>
+        public static string EnterPrice {
+            get {
+                return ResourceManager.GetString("EnterPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Пожайлуства укажите вашу ссылку на трейд. Ее можно получить [тут](https://steamcommunity.com/id/me/tradeoffers/privacy#trade_offer_access_url).
         /// </summary>
         public static string EnterTradeUrlText {
@@ -192,6 +201,15 @@ namespace SteamBot.Localization {
         public static string StartText {
             get {
                 return ResourceManager.GetString("StartText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сделка создана..
+        /// </summary>
+        public static string TradeCreated {
+            get {
+                return ResourceManager.GetString("TradeCreated", resourceCulture);
             }
         }
         

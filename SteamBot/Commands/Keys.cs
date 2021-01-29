@@ -49,8 +49,13 @@ namespace SteamBot.Commands
 				//},
 				new InlineKeyboardButton
 				{
-					CallbackData = $"{skin.Id} Confirm",
-					Text = "Confirm"
+					CallbackData = $"{skin.Id} Buy",
+					Text = "Buy"
+				},
+				new InlineKeyboardButton
+				{
+					CallbackData = $"{skin.Id} Sell",
+					Text = "Sell"
 				}
 			}.ToList());
 			var result = new InlineKeyboardMarkup(to);

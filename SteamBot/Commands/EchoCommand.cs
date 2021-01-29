@@ -14,6 +14,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using static SteamBot.Localization.Texts;
 
 namespace SteamBot.Commands
 {
@@ -96,29 +97,55 @@ namespace SteamBot.Commands
 			await using MemoryStream stream = new(image.Bytes);
 
 
-			var text = $"*{skin.SearchName}*\nPrice: {price}";
+			var text = $"*{skin.SearchName}*\nPrice: {price}$";
 			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
 		}
 	}
 
-	public class ConfirmSkinCommand : IStaticCommand
+
+	public class ChannelCommand : IStaticCommand
+	{
+		public bool SuitableFirst(Update message) => message?.ChannelPost != null;
+
+		public async Task<Response> Execute(IClient client)
+		{
+			var update = await client.GetUpdate();
+			return default;
+		}
+	}
+
+	public class SellSkinCommand : IStaticCommand
 	{
 		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
 
-		public ConfirmSkinCommand(SteamService steamService, TelegramContext context)
+		public SellSkinCommand(SteamService steamService, TelegramContext context)
 		{
 			_steamService = steamService;
 			_context = context;
 		}
 
-		public bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Confirm") ?? false;
+		public bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Sell") ?? false;
 
 		public async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
-			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split('\n')[0]));
+			var account = _context.GetAccount(query.From);
+			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split(' ')[0]));
 
+			account.CurrentTrade = new TradeItem
+			{
+				Skin = skin,
+			};
+
+			await client.SendTextMessage(ResourceManager.GetString("EnterPrice"));
+
+			account.CurrentTrade.Price = await client.GetValue<double>();
+
+			await client.SendTextMessage(ResourceManager.GetString("TradeCreated"));
+
+			//todo create Trade add trade item post to channel
+			//account.Trades.Add(account.CurrentTrade);
 
 
 			return new Response();
@@ -154,6 +181,7 @@ namespace SteamBot.Commands
 
 				var text = skin.ToMessage(fl);
 
+				//todo check if message 
 				//todo edit image?
 				if (query.InlineMessageId != null)
 				{
