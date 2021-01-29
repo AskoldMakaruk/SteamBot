@@ -41,11 +41,12 @@ namespace SteamBot.Commands
 
 			to.Add(new[]
 			{
-				new InlineKeyboardButton
-				{
-					CallbackData = $"{skin.Id} StatTrak",
-					Text = "StatTrak"
-				},
+				//todo
+				//new InlineKeyboardButton
+				//{
+				//	CallbackData = $"{skin.Id} StatTrak",
+				//	Text = "StatTrak"
+				//},
 				new InlineKeyboardButton
 				{
 					CallbackData = $"{skin.Id} Confirm",

@@ -66,4 +66,19 @@ namespace Tests
 			Assert.AreEqual(Helper.IsFloated("Sticker | k0nfig (Gold) | Krakow 2017"), false);
 		}
 	}
+
+	public class BotTests
+	{
+		[SetUp]
+		public void Setup()
+		{
+			
+		}
+
+		[Test]
+		public void CollectionsTest()
+		{
+		
+		}
+	}
 }

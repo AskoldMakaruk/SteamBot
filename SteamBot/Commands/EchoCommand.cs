@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,9 +7,7 @@ using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
-using Npgsql.Replication;
 using SteamBot.Database;
-using SteamBot.Localization;
 using SteamBot.Model;
 using SteamBot.Services;
 using Telegram.Bot.Types;
@@ -36,6 +33,7 @@ namespace SteamBot.Commands
 		public async Task<Response> Execute(IClient client)
 		{
 			//todo 2 buttons with stattrak/no stattral
+			//todo confirm inline btn
 			//todo price
 			//todo image background
 			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
@@ -103,22 +101,48 @@ namespace SteamBot.Commands
 		}
 	}
 
-
-	public class FloatInlineCommand : IStaticCommand
+	public class ConfirmSkinCommand : IStaticCommand
 	{
 		private readonly SteamService _steamService;
+		private readonly TelegramContext _context;
 
-		public FloatInlineCommand(SteamService steamService)
+		public ConfirmSkinCommand(SteamService steamService, TelegramContext context)
 		{
 			_steamService = steamService;
+			_context = context;
 		}
 
-		public bool SuitableLast(Update message) => Helper.Floats().Any(a => message?.CallbackQuery?.Data.Contains(a) ?? false);
+		public bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Confirm") ?? false;
 
 		public async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
-			var skin = _steamService.FindItems(query.Message.Caption.Split('\n')[0]).First();
+			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split('\n')[0]));
+
+
+
+			return new Response();
+		}
+	}
+
+	public class FloatInlineCommand : IStaticCommand
+	{
+		private readonly SteamService _steamService;
+		private readonly TelegramContext _context;
+
+
+		public FloatInlineCommand(SteamService steamService, TelegramContext context)
+		{
+			_steamService = steamService;
+			_context = context;
+		}
+
+		public bool SuitableFirst(Update message) => Helper.Floats().Any(a => message?.CallbackQuery?.Data.Contains(a) ?? false);
+
+		public async Task<Response> Execute(IClient client)
+		{
+			var query = await client.GetCallbackQuery();
+			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split(' ')[0].Trim()));
 
 			var floatString = query.Data[query.Data.IndexOf(' ')..];
 			if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl) && fl > 0 && fl <= 1)
@@ -128,8 +152,7 @@ namespace SteamBot.Commands
 					await client.AnswerCallbackQuery("Нет предмета с таким качеством.");
 				}
 
-				var price = skin.GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
-				var text = $"*{skin.SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}";
+				var text = skin.ToMessage(fl);
 
 				//todo edit image?
 				if (query.InlineMessageId != null)
