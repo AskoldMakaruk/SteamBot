@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
@@ -25,14 +26,16 @@ namespace SteamBot.Commands
 
 		public override async Task<Response> Execute(IClient client)
 		{
-			var count = _context.Skins.Count();
-			await client.SendTextMessage($"Skins count is {count}.");
-			var update = await client.GetTextMessage();
-			var acccount = _context.GetAccount(update);
+			var update = await client.GetUpdate();
+			var acccount = _context.GetAccount(update.Message);
+			
 			if (acccount == null || !acccount.IsAdmin)
 			{
 				return new Response();
 			}
+
+			var count = _context.Skins.Count();
+			await client.SendTextMessage($"Skins count is {count}.");
 
 			await _steamService.UpdateDb();
 			count = _context.Skins.Count();
