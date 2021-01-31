@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SteamApi;
 using SteamApi.Model;
@@ -14,7 +15,7 @@ namespace SteamBot.Services
 	{
 		private readonly SteamApiClient _client;
 		private readonly TelegramContext _context;
-		
+
 		public SteamService(SteamApiClient client, TelegramContext context)
 		{
 			_client = client;
@@ -25,12 +26,12 @@ namespace SteamBot.Services
 		{
 			var market = await _client.GetCSGOItems();
 
-			var skins = _context.Skins.ToList();
-			foreach (var group in market.Items.GroupBy(a => new { SkinName = a.GetSkinName(), WeaponName = a.GetWeaponName() }))
+			var skins = _context.Skins.Include(a => a.Prices).ToList();
+			foreach (var group in market.Items.GroupBy(a => new {SkinName = a.GetSkinName(), WeaponName = a.GetWeaponName()}))
 			{
 				try
 				{
-					var item = skins.FirstOrDefault(a => a.WeaponName == group.Key.WeaponName && a.SkinName == group.Key.SkinName);
+					var item = skins.FirstOrDefault(a => a.WeaponName == group.Key.WeaponName.Trim() && a.SkinName == group.Key.SkinName.Trim());
 
 					var first = group.First();
 					if (item == null)
@@ -44,23 +45,41 @@ namespace SteamBot.Services
 						item.ParseHashName(first.Name);
 					}
 
-					if (!first.IsFloated())
-					{
-						item.Price = first.Price;
-					}
-					else
-					{
-						var battleScarred = group.FirstOrDefault(a => a.Name.Contains("Battle-Scarred"));
-						var factoryNew = group.FirstOrDefault(a => a.Name.Contains("Factory New"));
-						var fieldTested = group.FirstOrDefault(a => a.Name.Contains("Field-Tested"));
-						var minimalWear = group.FirstOrDefault(a => a.Name.Contains("Minimal Wear"));
-						var wellWorn = group.FirstOrDefault(a => a.Name.Contains("Well-Worn"));
+					item.IsStatTrak = group.Any(a => a.Name.Contains(Helper.StatTrak));
 
-						item.BattleScarredPrice = battleScarred?.Price;
-						item.FactoryNewPrice = factoryNew?.Price;
-						item.FieldTestedPrice = fieldTested?.Price;
-						item.MinimalWearPrice = minimalWear?.Price;
-						item.WellWornPrice = wellWorn?.Price;
+					foreach (var compact in group)
+					{
+						SkinPrice price;
+						var statTrak = compact.Name.Contains(Helper.StatTrak);
+
+						if (!compact.IsFloated())
+						{
+							price = item.Prices.FirstOrDefault(a => a.StatTrak == statTrak);
+
+							if (price == null)
+							{
+								price = new SkinPrice();
+								item.Prices.Add(price);
+							}
+						}
+						else
+						{
+							var floatName = Helper.FloatsNames().First(name => compact.Name.Contains(name));
+
+							price = item.Prices.FirstOrDefault(a => a.FloatName == floatName && a.StatTrak == statTrak);
+
+							if (price == null)
+							{
+								price = new SkinPrice();
+								item.Prices.Add(price);
+							}
+
+							price.Float = Helper.GetFloatValue(floatName);
+							price.FloatName = floatName;
+						}
+
+						price.StatTrak = statTrak;
+						price.Value = compact.Price;
 					}
 				}
 				catch (Exception e)
@@ -77,7 +96,7 @@ namespace SteamBot.Services
 			return _context.Skins.Where(skin => skin.SearchName.ToLower().Contains(name.Trim().ToLower()));
 		}
 
-		public async Task<Item> GetSteamItem(Skin skin, float fl)
+		public async Task<Item> GetSteamItem(Skin skin, float? fl = null)
 		{
 			Item item;
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Resources;
 using SteamApi.Model;
 using SteamBot.Localization;
+using Telegram.Bot.Types;
 
 namespace SteamBot
 {
@@ -17,84 +18,50 @@ namespace SteamBot
 
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
-			var c = CultureInfo.GetCultureInfo(culture);
-			if (value >= 0 && value <= 0.07)
-			{
-				return ResourceManager.GetString("Float_Factory_New", c);
-				return "Factory New";
-			}
-
-			if (value <= 0.15)
-			{
-				return ResourceManager.GetString("Float_Minimal_Wear", c);
-				return "Minimal Wear";
-			}
-
-			if (value <= 0.38)
-			{
-				return ResourceManager.GetString("Float_Field_Tested", c);
-				return "Field-Tested";
-			}
-
-			if (value <= 0.45)
-			{
-				return ResourceManager.GetString("Float_Well_Worn", c);
-				return "Well-Worn";
-			}
-
-			return ResourceManager.GetString("Float_Battle_Scarred", c);
-			return "Battle-Scarred";
-		}
-
-		public static string[] Floats(string culture = "en-EN")
-		{
-			var c = CultureInfo.GetCultureInfo(culture);
-			return new[]
-			{
-				ResourceManager.GetString("Float_Factory_New", c),
-				ResourceManager.GetString("Float_Minimal_Wear", c),
-				ResourceManager.GetString("Float_Field_Tested", c),
-				ResourceManager.GetString("Float_Well_Worn", c),
-				ResourceManager.GetString("Float_Battle_Scarred", c)
-			};
-		}
-
-		public static bool IsFloated(string hashName)
-		{
-			return Floats().Any(hashName.Contains);
+			return Floats(culture).First(a => a.Value.Start <= value && value <= a.Value.End).Key;
 		}
 
 		public static bool TryGetFloatValue(string floatName, out float value, string culture = "en-EN")
 		{
+			var floats = Floats(culture);
 			floatName = floatName.Trim();
+			if (floats.ContainsKey(floatName))
+			{
+				value = floats[floatName].End - 0.01f;
+				return true;
+			}
+
 			value = -1f;
+			return false;
+		}
+
+		public static IReadOnlyDictionary<string, (float Start, float End)> Floats(string culture = "en-EN")
+		{
 			var c = CultureInfo.GetCultureInfo(culture);
-			if (floatName == ResourceManager.GetString("Float_Factory_New", c)?.Trim())
+			return new Dictionary<string, (float Start, float End)>
 			{
-				value = 0.06f;
-			}
+				[ResourceManager.GetString("Float_Factory_New", c)] = new(0f, 0.07f),
+				[ResourceManager.GetString("Float_Minimal_Wear", c)] = new(0.08f, 0.15f),
+				[ResourceManager.GetString("Float_Field_Tested", c)] = new(0.16f, 0.38f),
+				[ResourceManager.GetString("Float_Well_Worn", c)] = new(0.39f, 0.45f),
+				[ResourceManager.GetString("Float_Battle_Scarred", c)] = new(0.46f, 1f)
+			};
+		}
 
-			if (floatName == ResourceManager.GetString("Float_Minimal_Wear", c)?.Trim())
-			{
-				value = 0.14f;
-			}
+		public static string[] FloatsNames(string culture = "en-EN")
+		{
+			return Floats(culture).Keys.ToArray();
+		}
 
-			if (floatName == ResourceManager.GetString("Float_Field_Tested", c)?.Trim())
-			{
-				value = 0.37f;
-			}
+		public static bool IsFloated(string hashName)
+		{
+			return FloatsNames().Any(hashName.Contains);
+		}
 
-			if (floatName == ResourceManager.GetString("Float_Well_Worn", c)?.Trim())
-			{
-				value = 0.44f;
-			}
-
-			if (floatName == ResourceManager.GetString("Float_Battle_Scarred", c)?.Trim())
-			{
-				value = 0.99f;
-			}
-
-			return value > 0;
+		public static float GetFloatValue(string floatName, string culture = "en-EN")
+		{
+			TryGetFloatValue(floatName, out var res, culture);
+			return res;
 		}
 
 
@@ -189,6 +156,19 @@ namespace SteamBot
 			return IsFloated(compact.Name);
 		}
 
+		public static float? GetFloat(string text)
+		{
+			//todo
+			//if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl))
+			return text == null ? null : Helper.Floats().First(a => text.Contains(a.Key)).Value.Start;
+		}
+
+
+		public static float? GetFloat(this Message message) =>
+			GetFloat(message?.Text ?? message?.Caption);
+
+		public static float? GetFloat(this CallbackQuery query)
+			=> GetFloat(query.Data);
 
 		public static IFormatProvider Provider
 		{

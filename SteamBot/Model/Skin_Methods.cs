@@ -1,173 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using SteamBot.Localization;
+using System.Linq;
 
 namespace SteamBot.Model
 {
 	public partial class Skin
 	{
-		public string GetHashName(float fl) => GetHashName(Helper.GetFloatName(fl));
+		public string GetHashName(float? fl) => GetHashName(fl == null ? GetFloats("en-EN").First() : Helper.GetFloatName((float) fl));
 		public string GetHashName(string fl) => $"{GetHashName()} {(IsFloated ? $"({fl})" : String.Empty)}";
 		private string GetHashName() => $"{(IsKnife ? Helper.Star : String.Empty)} {(IsStatTrak ? Helper.StatTrak : String.Empty)} {WeaponName} | {SkinName}";
 
-		public List<double> GetPrices()
+		public List<double> GetPrices() => Prices.Select(a => a.Value).ToList();
+
+		public Image GetImage(float? fl = null)
 		{
-			if (!IsFloated)
-			{
-				return new List<double>
-				{
-					(double) Price
-				};
-			}
-
-			List<double> result = new();
-
-
-			if (BattleScarredPrice != null)
-			{
-				result.Add((double)BattleScarredPrice);
-			}
-
-			if (FactoryNewPrice != null)
-			{
-				result.Add((double)FactoryNewPrice);
-			}
-
-			if (FieldTestedPrice != null)
-			{
-				result.Add((double)FieldTestedPrice);
-			}
-
-			if (MinimalWearPrice != null)
-			{
-				result.Add((double)MinimalWearPrice);
-			}
-
-			if (WellWornPrice != null)
-			{
-				result.Add((double)WellWornPrice);
-			}
-
-			return result;
+			return GetPrice(fl)?.Image;
 		}
 
-		public Image GetImage(float fl = default)
+		public SkinPrice GetPrice(float? fl = null)
 		{
-			if (!IsFloated) return Image;
-			if (fl >= 0 && fl <= 0.07)
+			if (fl == null)
 			{
-				return FactoryNewImage;
+				return Prices.OrderBy(a => a.Float).First();
 			}
 
-			if (fl <= 0.15)
-			{
-				return MinimalWearImage;
-			}
-
-			if (fl <= 0.38)
-			{
-				return FieldTestedImage;
-			}
-
-			if (fl <= 0.45)
-			{
-				return WellWornImage;
-			}
-
-			return BattleScarredImage;
-		}
-
-		public void SetImage(Image image, float fl)
-		{
-			if (!IsFloated) Image = image;
-			if (fl >= 0 && fl <= 0.07)
-			{
-				FactoryNewImage = image;
-			}
-
-			else if (fl <= 0.15)
-			{
-				MinimalWearImage = image;
-			}
-
-			else if (fl <= 0.38)
-			{
-				FieldTestedImage = image;
-			}
-
-			else if (fl <= 0.45)
-			{
-				WellWornImage = image;
-			}
-
-			else BattleScarredImage = image;
-		}
-
-		public double? GetMarketPrice(float fl = default)
-		{
-			if (!IsFloated) return Price;
-			if (fl >= 0 && fl <= 0.07)
-			{
-				return FactoryNewPrice;
-			}
-
-			if (fl <= 0.15)
-			{
-				return MinimalWearPrice;
-			}
-
-			if (fl <= 0.38)
-			{
-				return FieldTestedPrice;
-			}
-
-			if (fl <= 0.45)
-			{
-				return WellWornPrice;
-			}
-
-			return BattleScarredPrice;
+			return Prices.FirstOrDefault(a => a.FloatName == Helper.GetFloatName((float) fl));
 		}
 
 		public void ParseHashName(string hashName)
 		{
 			IsFloated = Helper.IsFloated(hashName);
-			var HasDelimiter = hashName.Contains('|');
-			var marketHashName = hashName;
-
-			IsKnife = marketHashName.Contains(Helper.Star);
-			if (IsKnife)
-			{
-				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
-			}
-
-			IsStatTrak = marketHashName.Contains(Helper.StatTrak);
-			if (IsStatTrak)
-			{
-				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
-			}
-
-			var delimiterIndx = marketHashName.IndexOf('|');
-
-			WeaponName = HasDelimiter ? marketHashName[..delimiterIndx].Trim() : marketHashName.Trim();
-
-			if (HasDelimiter)
-			{
-				SkinName = (IsFloated ? marketHashName[(delimiterIndx + 2)..marketHashName.IndexOf('(')] : marketHashName[(delimiterIndx + 2)..]).Trim();
-			}
-			else
-			{
-				SkinName = WeaponName;
-			}
-
+			IsKnife = hashName.Contains(Helper.Star);
+			(WeaponName, SkinName) = Helper.GetNormalizedName(hashName);
 			SearchName = $"{WeaponName} {SkinName}";
 		}
 
-		public string ToMessage(float fl = default)
+		public string ToMessage(double? price = null, float? fl = null)
 		{
-			var price = GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
-			return $"*{SearchName}*\n{Helper.GetFloatName(fl)}\nPrice: {price}$";
+			string priceTxt = null;
+			if (price != null)
+			{
+				priceTxt = $"Seller's price: {price.Value.ToString("F", CultureInfo.InvariantCulture)}$";
+			}
+
+			string priceTexts;
+			if (fl == 0)
+			{
+				var prices = GetPrices();
+				priceTexts = $"{prices.Min().ToString("F", CultureInfo.InvariantCulture)}$ - {prices.Max().ToString("F", CultureInfo.InvariantCulture)}$";
+			}
+			else
+			{
+				priceTexts = $"{GetPrice(fl)?.Value.ToString("F", CultureInfo.InvariantCulture)}$";
+			}
+
+
+			return $"*{SearchName}*\n{Helper.GetFloatName(fl ?? default)}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
 		}
 
 		public static Skin FromMessage()
@@ -177,37 +66,7 @@ namespace SteamBot.Model
 
 		public List<string> GetFloats(string culture)
 		{
-			if (!IsFloated) return null;
-			List<string> result = new();
-			var resourceManager = Texts.ResourceManager;
-			var c = CultureInfo.GetCultureInfo(culture);
-
-			if (FactoryNewPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Factory_New", c));
-			}
-
-			if (MinimalWearPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Minimal_Wear", c));
-			}
-
-			if (FieldTestedPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Field_Tested", c));
-			}
-
-			if (WellWornPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Well_Worn", c));
-			}
-
-			if (BattleScarredPrice != null)
-			{
-				result.Add(resourceManager.GetString("Float_Battle_Scarred", c));
-			}
-
-			return result;
+			return Prices.OrderBy(a => a.Float).Select(a => Helper.GetFloatName(a.Float ?? default, culture)).Distinct().ToList();
 		}
 	}
 }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Reflection;
 using BotFramework.Handlers;
 using Microsoft.Extensions.Configuration;
-using Ninject;
 using Ninject.Modules;
 using SteamApi;
 using SteamBot.Database;
@@ -37,7 +34,7 @@ namespace SteamBot
 			//var steamService = kernel.Get<SteamService>();
 			//steamService.UpdateDb().Wait();
 			//Console.WriteLine(st.Elapsed);
-			
+
 			var config = GetConfiguration();
 
 			new HandlerConfigurationBuilder(config["BotToken"], typeof(Program).Assembly)

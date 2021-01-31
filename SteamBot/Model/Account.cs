@@ -14,8 +14,8 @@ namespace SteamBot.Model
 		public string Locale { get; set; }
 		public virtual bool IsAdmin { get; set; }
 
-		public virtual ICollection<Trade> Trades { get; set; }
-		public virtual ICollection<Trade> Buys { get; set; }
+		public virtual ICollection<Trade> Trades { get; set; } = new HashSet<Trade>();
+		public virtual ICollection<Trade> Buys { get; set; } = new HashSet<Trade>();
 
 		[NotMapped]
 		public TradeItem CurrentTrade { get; set; }
@@ -49,7 +49,7 @@ namespace SteamBot.Model
 		public Image Image => Skin.GetImage(Float);
 
 		public string HashName => Skin.GetHashName(Float);
-		public double? MarketPrice => Skin.GetMarketPrice(Float);
+		public double? MarketPrice => Skin.GetPrice(Float).Value;
 	}
 
 

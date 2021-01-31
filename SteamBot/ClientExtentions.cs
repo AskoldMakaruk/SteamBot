@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
+using SteamBot.Commands;
+using SteamBot.Model;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamBot
 {
@@ -56,6 +62,23 @@ namespace SteamBot
 				value = default;
 				return false;
 			}
+		}
+
+		public static async Task<Message> SendSkin(this IClient client, Skin skin, string text = null, float fl = default, IReplyMarkup replyMarkup = null, Chat? chatid = default)
+		{
+			var image = skin.GetImage(fl);
+			await using MemoryStream stream = new(image.Bytes);
+
+			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU");
+
+			text ??= skin.ToMessage();
+
+			if (chatid == null)
+			{
+				return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup);
+			}
+
+			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup, chatId: chatid);
 		}
 	}
 }

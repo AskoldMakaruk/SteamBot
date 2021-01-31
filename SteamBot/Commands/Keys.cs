@@ -61,5 +61,18 @@ namespace SteamBot.Commands
 			var result = new InlineKeyboardMarkup(to);
 			return result;
 		}
+
+		public static InlineKeyboardMarkup ChannelMarkup(int id, string botName)
+		{
+			return new[]
+			{
+				new InlineKeyboardButton
+				{
+					CallbackData = $"{id} Buy",
+					Text = "Buy",
+					Url = $"https://t.me/{botName}?start={id}"
+				},
+			};
+		}
 	}
 }

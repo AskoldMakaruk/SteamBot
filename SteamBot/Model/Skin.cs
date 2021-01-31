@@ -15,23 +15,22 @@ namespace SteamBot.Model
 		public virtual int SteamItemId { get; set; }
 		public bool IsFloated { get; set; }
 
-		public double? Price { get; set; }
-		public double? BattleScarredPrice { get; set; }
-		public double? FactoryNewPrice { get; set; }
-		public double? FieldTestedPrice { get; set; }
-		public double? MinimalWearPrice { get; set; }
-		public double? WellWornPrice { get; set; }
-
-		public virtual Image Image { get; set; }
-		public virtual Image BattleScarredImage { get; set; }
-		public virtual Image FactoryNewImage { get; set; }
-		public virtual Image FieldTestedImage { get; set; }
-		public virtual Image MinimalWearImage { get; set; }
-		public virtual Image WellWornImage { get; set; }
-
 		public DateTime CreateTS { get; set; }
 		public DateTime UpdateTS { get; set; }
 
-		public virtual ICollection<TradeItem> TradeItems { get; set; }
+		public virtual ICollection<TradeItem> TradeItems { get; set; } = new HashSet<TradeItem>();
+		public virtual ICollection<SkinPrice> Prices { get; set; } = new HashSet<SkinPrice>();
+	}
+
+	public class SkinPrice
+	{
+		public int Id { get; set; }
+		public bool? StatTrak { get; set; }
+		public float? Float { get; set; }
+		public string FloatName { get; set; }
+		public double Value { get; set; }
+
+		public virtual Image Image { get; set; }
+		public virtual Skin Skin { get; set; }
 	}
 }
