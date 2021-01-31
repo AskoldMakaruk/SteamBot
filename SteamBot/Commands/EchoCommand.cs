@@ -18,7 +18,7 @@ using static SteamBot.Localization.Texts;
 
 namespace SteamBot.Commands
 {
-	public class NewTradeCommand : IStaticCommand
+	public class NewTradeCommand : StaticCommand
 	{
 		private readonly TelegramContext _context;
 		private readonly SteamService _steamService;
@@ -29,9 +29,9 @@ namespace SteamBot.Commands
 			_steamService = steamService;
 		}
 
-		public bool SuitableLast(Update message) => message?.Message?.Text != null; // == Texts.NewTradeBtn;
+		public override bool SuitableLast(Update message) => message?.Message?.Text != null; // == Texts.NewTradeBtn;
 
-		public async Task<Response> Execute(IClient client)
+		public override async Task<Response> Execute(IClient client)
 		{
 			//todo 2 buttons with stattrak/no stattral
 			//todo confirm inline btn
@@ -102,19 +102,18 @@ namespace SteamBot.Commands
 		}
 	}
 
-
-	public class ChannelCommand : IStaticCommand
+	public class ChannelCommand : StaticCommand
 	{
-		public bool SuitableFirst(Update message) => message?.ChannelPost != null;
+		public override bool SuitableFirst(Update message) => message?.ChannelPost != null;
 
-		public async Task<Response> Execute(IClient client)
+		public override async Task<Response> Execute(IClient client)
 		{
 			var update = await client.GetUpdate();
 			return default;
 		}
 	}
 
-	public class SellSkinCommand : IStaticCommand
+	public class SellSkinCommand : StaticCommand
 	{
 		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
@@ -125,9 +124,9 @@ namespace SteamBot.Commands
 			_context = context;
 		}
 
-		public bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Sell") ?? false;
+		public override bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Sell") ?? false;
 
-		public async Task<Response> Execute(IClient client)
+		public override async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
 			var account = _context.GetAccount(query.From);
@@ -144,6 +143,7 @@ namespace SteamBot.Commands
 
 			await client.SendTextMessage(ResourceManager.GetString("TradeCreated"));
 
+
 			//todo create Trade add trade item post to channel
 			//account.Trades.Add(account.CurrentTrade);
 
@@ -152,11 +152,10 @@ namespace SteamBot.Commands
 		}
 	}
 
-	public class FloatInlineCommand : IStaticCommand
+	public class FloatInlineCommand : StaticCommand
 	{
 		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
-
 
 		public FloatInlineCommand(SteamService steamService, TelegramContext context)
 		{
@@ -164,9 +163,9 @@ namespace SteamBot.Commands
 			_context = context;
 		}
 
-		public bool SuitableFirst(Update message) => Helper.Floats().Any(a => message?.CallbackQuery?.Data.Contains(a) ?? false);
+		public override bool SuitableFirst(Update message) => Helper.Floats().Any(a => message?.CallbackQuery?.Data.Contains(a) ?? false);
 
-		public async Task<Response> Execute(IClient client)
+		public override async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
 			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split(' ')[0].Trim()));
@@ -192,6 +191,38 @@ namespace SteamBot.Commands
 					await client.EditMessageCaption(query.Message.MessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU"));
 				}
 			}
+
+			return new Response();
+		}
+	}
+
+	public class UpdateDbCommand : StaticCommand
+	{
+		private readonly SteamService _steamService;
+		private readonly TelegramContext _context;
+
+		public UpdateDbCommand(SteamService steamService, TelegramContext context)
+		{
+			_steamService = steamService;
+			_context = context;
+		}
+
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/updatedb";
+
+		public override async Task<Response> Execute(IClient client)
+		{
+			var count = _context.Skins.Count();
+			await client.SendTextMessage($"Skins count is {count}.");
+			var update = await client.GetTextMessage();
+			var acccount = _context.GetAccount(update);
+			if (acccount == null || !acccount.IsAdmin)
+			{
+				return new Response();
+			}
+
+			await _steamService.UpdateDb();
+			count = _context.Skins.Count();
+			await client.SendTextMessage($"New skins count is {count}.");
 
 			return new Response();
 		}

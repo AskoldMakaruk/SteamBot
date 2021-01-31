@@ -4,5 +4,6 @@
 	{
 		internal static string Base => "https://api.steamapis.com/market";
 		internal static string Item => Base + "/item";
+		internal static string Items => Base + "/items";
 	}
 }

@@ -10,53 +10,56 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-public class StartCommand : IStaticCommand
+namespace SteamBot.Commands
 {
-	private readonly TelegramContext _context;
-
-	public StartCommand(TelegramContext context)
+	public class StartCommand : StaticCommand
 	{
-		_context = context;
-	}
+		private readonly TelegramContext _context;
 
-	public bool SuitableFirst(Update message) => message?.Message?.Text == "/start";
-
-	public async Task<Response> Execute(IClient client)
-	{
-		var update = await client.GetUpdate();
-		var account = _context.GetAccount(update.Message);
-		if (account.TradeUrl is null)
+		public StartCommand(TelegramContext context)
 		{
-			await client.SendTextMessage(Texts.EnterTradeUrlText, disableWebPagePreview: true, parseMode: ParseMode.Markdown);
-			var message = await client.GetTextMessage();
-
-			while (!Uri.IsWellFormedUriString(message.Text, UriKind.Absolute))
-			{
-				await client.SendTextMessage(Texts.EnterUrlText);
-				message = await client.GetTextMessage();
-			}
-
-			account.TradeUrl = message.Text;
-			await _context.SaveChangesAsync();
+			_context = context;
 		}
 
-		ReplyKeyboardMarkup startkeys = new[]
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/start";
+
+		public override async Task<Response> Execute(IClient client)
 		{
-			new[]
+			var update = await client.GetUpdate();
+			var account = _context.GetAccount(update.Message);
+			if (account.TradeUrl is null)
 			{
-				Texts.NewTradeBtn,
-				Texts.MyTradesBtn
-			},
-			new[]
-			{
-				Texts.MyMoneyBtn,
-				Texts.MyStats
+				await client.SendTextMessage(Texts.EnterTradeUrlText, disableWebPagePreview: true, parseMode: ParseMode.Markdown);
+				var message = await client.GetTextMessage();
+
+				while (!Uri.IsWellFormedUriString(message.Text, UriKind.Absolute))
+				{
+					await client.SendTextMessage(Texts.EnterUrlText);
+					message = await client.GetTextMessage();
+				}
+
+				account.TradeUrl = message.Text;
+				await _context.SaveChangesAsync();
 			}
-		};
-		startkeys.ResizeKeyboard = true;
 
-		await client.SendTextMessage(Texts.StartText, replyMarkup: startkeys);
+			ReplyKeyboardMarkup startkeys = new[]
+			{
+				new[]
+				{
+					Texts.NewTradeBtn,
+					Texts.MyTradesBtn
+				},
+				new[]
+				{
+					Texts.MyMoneyBtn,
+					Texts.MyStats
+				}
+			};
+			startkeys.ResizeKeyboard = true;
 
-		return new Response();
+			await client.SendTextMessage(Texts.StartText, replyMarkup: startkeys);
+
+			return new Response();
+		}
 	}
 }

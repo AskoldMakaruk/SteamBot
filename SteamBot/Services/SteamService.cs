@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SteamApi;
 using SteamApi.Model;
 using SteamBot.Database;
@@ -22,17 +15,18 @@ namespace SteamBot.Services
 		private readonly SteamApiClient _client;
 		private readonly TelegramContext _context;
 		
-
 		public SteamService(SteamApiClient client, TelegramContext context)
 		{
 			_client = client;
 			_context = context;
 		}
 
-		public async Task UpdateDb(IEnumerable<JsonItem> Bag)
+		public async Task UpdateDb()
 		{
+			var market = await _client.GetCSGOItems();
+
 			var skins = _context.Skins.ToList();
-			foreach (var group in Bag.GroupBy(a => new {a.SkinName, a.WeaponName}))
+			foreach (var group in market.Items.GroupBy(a => new { SkinName = a.GetSkinName(), WeaponName = a.GetWeaponName() }))
 			{
 				try
 				{
@@ -50,7 +44,7 @@ namespace SteamBot.Services
 						item.ParseHashName(first.Name);
 					}
 
-					if (!first.IsFloated)
+					if (!first.IsFloated())
 					{
 						item.Price = first.Price;
 					}
@@ -83,26 +77,6 @@ namespace SteamBot.Services
 			return _context.Skins.Where(skin => skin.SearchName.ToLower().Contains(name.Trim().ToLower()));
 		}
 
-		//public async Task<TradeItem> GetItem(string name, float fl)
-		//{
-		//	Console.WriteLine($"Trying to get item with name {name} float: {fl} ({Helper.GetFloatName(fl)})");
-
-		//	var jsonResult = FindItems(name).FirstOrDefault();
-
-		//	if (jsonResult is null)
-		//	{
-		//		return null;
-		//	}
-
-		//	var hashName = jsonResult.GetHashName(fl);
-
-		//	Console.WriteLine($"Hashname is {hashName}");
-
-		//	var result = await GetSteamItem(hashName);
-		//	result.Float = fl;
-		//	return result;
-		//}
-
 		public async Task<Item> GetSteamItem(Skin skin, float fl)
 		{
 			Item item;
@@ -129,71 +103,6 @@ namespace SteamBot.Services
 			await _context.SaveChangesAsync();
 
 			return item;
-		}
-
-
-		public class JsonItem
-		{
-			public string Name { get; set; }
-			public double Price { get; set; }
-			public bool IsFloated => Helper.IsFloated(Name);
-			public bool HasDelimiter => Name.Contains('|');
-
-			public bool IsKnife => Name.Contains(Helper.Star);
-			public bool IsStatTrak => Name.Contains(Helper.StatTrak);
-
-			public string NormalizedName => Name.Replace(Helper.Star, String.Empty).Replace(Helper.StatTrak, String.Empty).Trim();
-
-			public string FullName => $"{WeaponName} | {SkinName}";
-
-			public string WeaponName
-			{
-				get
-				{
-					return Skin.GetNormalizedName(Name).WeaponName;
-					if (HasDelimiter)
-					{
-						var delimiterIndx = NormalizedName.IndexOf('|');
-						return NormalizedName[..delimiterIndx].Trim();
-					}
-
-					return Name.Trim();
-				}
-			}
-
-			public string SkinName
-			{
-				get
-				{
-					return Skin.GetNormalizedName(Name).SkinName;
-					if (HasDelimiter)
-					{
-						var delimiterIndx = NormalizedName.IndexOf('|');
-
-						return (IsFloated ? NormalizedName[(delimiterIndx + 2)..NormalizedName.IndexOf('(')] : NormalizedName[(delimiterIndx + 2)..]).Trim();
-					}
-
-					return WeaponName;
-				}
-			}
-
-
-			public JsonItem(string name, double price)
-			{
-				Name = name;
-				Price = price;
-			}
-
-			public void Deconstruct(out string hashname, out double price)
-			{
-				hashname = Name;
-				price = Price;
-			}
-
-			public string ToMarkupString()
-			{
-				return $"*{Name}*\nPrice: {Price}$";
-			}
 		}
 	}
 }

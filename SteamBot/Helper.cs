@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
+using SteamApi.Model;
 using SteamBot.Localization;
 
 namespace SteamBot
 {
 	public static class Helper
 	{
-		public static ResourceManager ResourceManager => Texts.ResourceManager;
 		public const string Star = "★";
 		public const string StatTrak = "StatTrak™";
 
+		public static ResourceManager ResourceManager => Texts.ResourceManager;
 
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
@@ -137,6 +138,57 @@ namespace SteamBot
 				}
 			}
 		}
+
+		public static (string WeaponName, string SkinName) GetNormalizedName(string hashName)
+		{
+			var IsFloated = Helper.IsFloated(hashName);
+			var HasDelimiter = hashName.Contains('|');
+			var marketHashName = hashName;
+
+			var IsKnife = marketHashName.Contains(Helper.Star);
+			if (IsKnife)
+			{
+				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
+			}
+
+			var IsStatTrak = marketHashName.Contains(Helper.StatTrak);
+			if (IsStatTrak)
+			{
+				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
+			}
+
+			var delimiterIndx = marketHashName.IndexOf('|');
+
+			var WeaponName = HasDelimiter ? marketHashName[..delimiterIndx].Trim() : marketHashName.Trim();
+
+			string skinName;
+			if (HasDelimiter)
+			{
+				skinName = (IsFloated ? marketHashName[(delimiterIndx + 2)..marketHashName.IndexOf('(')] : marketHashName[(delimiterIndx + 2)..]).Trim();
+			}
+			else
+			{
+				skinName = WeaponName;
+			}
+
+			return (WeaponName, skinName);
+		}
+
+		public static string GetWeaponName(this MarketItemCompact compact)
+		{
+			return GetNormalizedName(compact.Name).WeaponName;
+		}
+
+		public static string GetSkinName(this MarketItemCompact compact)
+		{
+			return GetNormalizedName(compact.Name).SkinName;
+		}
+
+		public static bool IsFloated(this MarketItemCompact compact)
+		{
+			return IsFloated(compact.Name);
+		}
+
 
 		public static IFormatProvider Provider
 		{

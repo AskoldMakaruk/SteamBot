@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using SteamBot.Localization;
 
 namespace SteamBot.Model
@@ -27,27 +26,27 @@ namespace SteamBot.Model
 
 			if (BattleScarredPrice != null)
 			{
-				result.Add((double) BattleScarredPrice);
+				result.Add((double)BattleScarredPrice);
 			}
 
 			if (FactoryNewPrice != null)
 			{
-				result.Add((double) FactoryNewPrice);
+				result.Add((double)FactoryNewPrice);
 			}
 
 			if (FieldTestedPrice != null)
 			{
-				result.Add((double) FieldTestedPrice);
+				result.Add((double)FieldTestedPrice);
 			}
 
 			if (MinimalWearPrice != null)
 			{
-				result.Add((double) MinimalWearPrice);
+				result.Add((double)MinimalWearPrice);
 			}
 
 			if (WellWornPrice != null)
 			{
-				result.Add((double) WellWornPrice);
+				result.Add((double)WellWornPrice);
 			}
 
 			return result;
@@ -165,41 +164,6 @@ namespace SteamBot.Model
 			SearchName = $"{WeaponName} {SkinName}";
 		}
 
-		public static (string WeaponName, string SkinName) GetNormalizedName(string hashName)
-		{
-			var IsFloated = Helper.IsFloated(hashName);
-			var HasDelimiter = hashName.Contains('|');
-			var marketHashName = hashName;
-
-			var IsKnife = marketHashName.Contains(Helper.Star);
-			if (IsKnife)
-			{
-				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
-			}
-
-			var IsStatTrak = marketHashName.Contains(Helper.StatTrak);
-			if (IsStatTrak)
-			{
-				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
-			}
-
-			var delimiterIndx = marketHashName.IndexOf('|');
-
-			var WeaponName = HasDelimiter ? marketHashName[..delimiterIndx].Trim() : marketHashName.Trim();
-
-			string skinName;
-			if (HasDelimiter)
-			{
-				skinName = (IsFloated ? marketHashName[(delimiterIndx + 2)..marketHashName.IndexOf('(')] : marketHashName[(delimiterIndx + 2)..]).Trim();
-			}
-			else
-			{
-				skinName = WeaponName;
-			}
-
-			return (WeaponName, skinName);
-		}
-
 		public string ToMessage(float fl = default)
 		{
 			var price = GetMarketPrice(fl)?.ToString("F", CultureInfo.InvariantCulture);
@@ -227,7 +191,7 @@ namespace SteamBot.Model
 			{
 				result.Add(resourceManager.GetString("Float_Minimal_Wear", c));
 			}
-			
+
 			if (FieldTestedPrice != null)
 			{
 				result.Add(resourceManager.GetString("Float_Field_Tested", c));

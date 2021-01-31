@@ -9,7 +9,7 @@ using Telegram.Bot.Types;
 namespace SteamBot.Commands
 {
 	//todo
-	public class StatTrakInlineCommand : IStaticCommand
+	public class StatTrakInlineCommand : StaticCommand
 	{
 		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
@@ -20,9 +20,9 @@ namespace SteamBot.Commands
 			_context = context;
 
 		}
-		public bool SuitableLast(Update message) => message?.CallbackQuery?.Data == "StatTrak";
+		public override bool SuitableLast(Update message) => message?.CallbackQuery?.Data == "StatTrak";
 
-		public async Task<Response> Execute(IClient client)
+		public override async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
 			var data = query.Data.Split('\n');
