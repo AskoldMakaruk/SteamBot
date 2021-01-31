@@ -80,33 +80,7 @@ namespace SteamBot.Database
 
 		#region Account
 
-		public static MemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-		public static DateTimeOffset DefaultCacheOffset => DateTimeOffset.Now.Add(new TimeSpan(0, 10, 0));
-
-		public Account this[long key]
-		{
-			get => GetAccount(key);
-			set => cache.Set(key, value, DefaultCacheOffset);
-		}
-
-		public static Account GetAccount(long chatId)
-		{
-			var cachedAccount = cache.Get(chatId);
-			return cachedAccount as Account;
-		}
-
-		public Account GetAccount(User user)
-		{
-			var result = GetAccount(user.Id);
-			if (result != null)
-				return result;
-
-			var account = Accounts.FirstOrDefault(a => a.ChatId == user.Id) ?? CreateAccount(user);
-
-			cache.Set((long)user.Id, account, DefaultCacheOffset);
-
-			return account;
-		}
+		public Account GetAccount(User user) => Accounts.FirstOrDefault(a => a.ChatId == user.Id) ?? CreateAccount(user);
 
 		public Account GetAccount(Message message) => GetAccount(message.From);
 		
