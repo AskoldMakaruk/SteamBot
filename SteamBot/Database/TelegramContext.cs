@@ -17,6 +17,7 @@ namespace SteamBot.Database
 		public DbSet<Skin> Skins { get; set; }
 		public DbSet<Trade> Trades { get; set; }
 		public DbSet<SteamItem> SteamItems { get; set; }
+		public DbSet<ChatRoom> ChatRooms { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{

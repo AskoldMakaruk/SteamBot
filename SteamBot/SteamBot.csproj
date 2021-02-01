@@ -44,12 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<Reference Include="BotFramework">
-      <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
-    </Reference>-->
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Localization\Texts.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

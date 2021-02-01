@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
@@ -9,7 +8,7 @@ using SteamBot.Database;
 using SteamBot.Services;
 using Telegram.Bot.Types;
 
-namespace SteamBot.Commands
+namespace SteamBot.Commands.AdminCommands
 {
 	public class UpdateDbCommand : StaticCommand
 	{

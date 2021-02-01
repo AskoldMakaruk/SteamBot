@@ -74,5 +74,29 @@ namespace SteamBot.Commands
 				},
 			};
 		}
+		
+		public static InlineKeyboardMarkup GroupMarkup(string inviteLink)
+		{
+			return new[]
+			{
+				new InlineKeyboardButton
+				{
+					Text = "Buy",
+					Url = inviteLink
+				},
+			};
+		}
+
+		public static InlineKeyboardMarkup ConfirmBuyer(long buyerId)
+		{
+			return new[]
+			{
+				new InlineKeyboardButton
+				{
+					CallbackData = $"{buyerId} Buyer",
+					Text = "Accept trade",
+				},
+			};
+		}
 	}
 }

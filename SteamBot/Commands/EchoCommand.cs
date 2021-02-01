@@ -30,10 +30,9 @@ namespace SteamBot.Commands
 		public override async Task<Response> Execute(IClient client)
 		{
 			//todo 2 buttons with stattrak/no stattral
-			//todo confirm inline btn
-			//todo price
 			//todo image background
 			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
+
 			var _ = await client.GetUpdate();
 			await client.SendTextMessage("Send item name to start:");
 			var message = await client.GetTextMessage();
@@ -74,18 +73,18 @@ namespace SteamBot.Commands
 		}
 	}
 
-	public class ChannelCommand : StaticCommand
-	{
-		public override bool SuitableFirst(Update message) => message?.ChannelPost != null;
+	//public class ChannelCommand : StaticCommand
+	//{
+	//	public override bool SuitableFirst(Update message) => message?.ChannelPost != null;
 
-		public override async Task<Response> Execute(IClient client)
-		{
-			var update = await client.GetUpdate();
-			Console.WriteLine(update.ChannelPost.Chat.Id);
-			await client.SendTextMessage("Message from bot", update.ChannelPost.Chat.Id);
-			return default;
-		}
-	}
+	//	public override async Task<Response> Execute(IClient client)
+	//	{
+	//		var update = await client.GetUpdate();
+	//		Console.WriteLine(update.ChannelPost.Chat.Id);
+	//		await client.SendTextMessage("Message from bot", update.ChannelPost.Chat.Id);
+	//		return default;
+	//	}
+	//}
 
 	public class FloatInlineCommand : StaticCommand
 	{
@@ -131,4 +130,6 @@ namespace SteamBot.Commands
 			return new Response();
 		}
 	}
+
+	
 }

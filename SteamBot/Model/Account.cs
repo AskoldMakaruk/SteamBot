@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,6 +25,7 @@ namespace SteamBot.Model
 	{
 		public int Id { get; set; }
 		public long ChannelPostId { get; set; }
+		public virtual ChatRoom Room { get; set; }
 		public virtual TradeItem TradeItem { get; set; }
 		public virtual Account Buyer { get; set; }
 		public virtual Account Seller { get; set; }
@@ -52,7 +53,6 @@ namespace SteamBot.Model
 		public double? MarketPrice => Skin.GetPrice(Float).Value;
 	}
 
-
 	public class SteamItem
 	{
 		public int Id { get; set; }
@@ -66,5 +66,17 @@ namespace SteamBot.Model
 		public int Id { get; set; }
 		public byte[] Bytes { get; set; }
 		public string FileId { get; set; }
+	}
+
+	public class ChatRoom
+	{
+		public int Id { get; set; }
+		public string InviteLink { get; set; }
+		public long ChatId { get; set; }
+		public int? TradeId { get; set; }
+		public bool AllMembersInside { get; set; }
+		public DateTime LastMemberChange { get; set; }
+
+		public virtual Trade Trade { get; set; }
 	}
 }
