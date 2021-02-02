@@ -87,16 +87,18 @@ namespace SteamBot.Commands
 			};
 		}
 
-		public static InlineKeyboardMarkup ConfirmBuyer(long buyerId)
+		public static ReplyKeyboardMarkup GroupMenu
 		{
-			return new[]
-			{
-				new InlineKeyboardButton
+			get
+			{	ReplyKeyboardMarkup result =new[]
 				{
-					CallbackData = $"{buyerId} Buyer",
-					Text = "Accept trade",
-				},
-			};
+					"Cancel Trade",
+					"Set price"
+				};
+				result.ResizeKeyboard = true;
+				result.OneTimeKeyboard = true;
+				return result;
+			}
 		}
 	}
 }

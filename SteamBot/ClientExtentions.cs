@@ -80,5 +80,15 @@ namespace SteamBot
 
 			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup, chatId: chatid);
 		}
+
+		public static async Task<Message> GetTradeCancelMessage(this IClient client)
+		{
+			return (await client.GetUpdate(update => update?.Message?.Text == "I'm absolutely sure.")).Message;
+		}
+
+		public static async Task<Message> GetTextMessage(this IClient client, Func<Message, bool> predicate)
+		{
+			return (await client.GetUpdate(update => update?.Message != null && predicate.Invoke(update.Message))).Message;
+		}
 	}
 }
