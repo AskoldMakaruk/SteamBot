@@ -2,32 +2,32 @@
 
 namespace SteamBot.Migrations
 {
-    public partial class fifth : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<string>(
-                name: "SearchName",
-                table: "Skins",
-                type: "text",
-                nullable: true);
+	public partial class fifth : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.AddColumn<string>(
+				"SearchName",
+				"Skins",
+				"text",
+				nullable: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Skins_SkinName_WeaponName",
-                table: "Skins",
-                columns: new[] { "SkinName", "WeaponName" },
-                unique: true);
-        }
+			migrationBuilder.CreateIndex(
+				"IX_Skins_SkinName_WeaponName",
+				"Skins",
+				new[] {"SkinName", "WeaponName"},
+				unique: true);
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropIndex(
-                name: "IX_Skins_SkinName_WeaponName",
-                table: "Skins");
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropIndex(
+				"IX_Skins_SkinName_WeaponName",
+				"Skins");
 
-            migrationBuilder.DropColumn(
-                name: "SearchName",
-                table: "Skins");
-        }
-    }
+			migrationBuilder.DropColumn(
+				"SearchName",
+				"Skins");
+		}
+	}
 }

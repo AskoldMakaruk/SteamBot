@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
@@ -88,8 +87,8 @@ namespace SteamBot.Commands
 
 	public class FloatInlineCommand : StaticCommand
 	{
-		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
+		private readonly SteamService _steamService;
 
 		public FloatInlineCommand(SteamService steamService, TelegramContext context)
 		{
@@ -105,7 +104,7 @@ namespace SteamBot.Commands
 			var skin = await _context.GetSkinAsync(query);
 
 			var flN = query.GetFloat();
-			if (flN > 0 && flN <= 1)
+			if (flN >= 0 && flN <= 1)
 			{
 				var fl = (float) flN;
 				if (skin.GetPrice(fl) == null)
@@ -130,6 +129,4 @@ namespace SteamBot.Commands
 			return new Response();
 		}
 	}
-
-	
 }

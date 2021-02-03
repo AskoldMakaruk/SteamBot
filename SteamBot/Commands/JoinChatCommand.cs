@@ -36,8 +36,8 @@ namespace SteamBot.Commands
 
 			try
 			{
-				var a = (await client.GetChatMember((int) chatRoom.Trade.Seller.ChatId, chatRoom.ChatId));
-				var b = (await client.GetChatMember((int) chatRoom.Trade.Buyer.ChatId, chatRoom.ChatId));
+				var a = await client.GetChatMember((int) chatRoom.Trade.Seller.ChatId, chatRoom.ChatId);
+				var b = await client.GetChatMember((int) chatRoom.Trade.Buyer.ChatId, chatRoom.ChatId);
 
 				chatRoom.AllMembersInside = true;
 			}
@@ -47,7 +47,7 @@ namespace SteamBot.Commands
 			}
 
 			chatRoom.LastMemberChange = DateTime.Now;
-			
+
 			await _context.SaveChangesAsync();
 			await client.SendTextMessage("Start trading guys..", chat);
 

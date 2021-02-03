@@ -10,12 +10,10 @@ namespace SteamApi
 {
 	public class SteamApiClient : IDisposable
 	{
-		public string Token { get; }
-
 		private readonly HttpClient client;
 
 		/// <summary>
-		/// Creates new SteamApiClient.
+		///     Creates new SteamApiClient.
 		/// </summary>
 		/// <param name="token">Can be generated in Discord with bot BrawlAPI#8520</param>
 		public SteamApiClient(string token)
@@ -28,13 +26,21 @@ namespace SteamApi
 			};
 		}
 
+		public string Token { get; }
+
+
+		public void Dispose()
+		{
+			client.Dispose();
+		}
+
 		public async Task<Item> GetCSGOItem(string itemHashName) => await GetItem(AppId.CSGO, itemHashName);
 
 		public async Task<MarketCompact> GetCSGOItems() => await GetMarketItems(AppId.CSGO);
 
 
 		/// <summary>
-		/// Gets market items.
+		///     Gets market items.
 		/// </summary>
 		/// <param name="appId"></param>
 		/// <returns></returns>
@@ -51,7 +57,7 @@ namespace SteamApi
 		}
 
 		/// <summary>
-		/// Gets item from steam market.
+		///     Gets item from steam market.
 		/// </summary>
 		/// <param name="appId">App id from https://steamdb.info/apps/ </param>
 		/// <param name="itemHashName">Full item name in string</param>
@@ -69,12 +75,6 @@ namespace SteamApi
 		{
 			var response = await client.GetAsync(url);
 			return !response.IsSuccessStatusCode ? default : await response.Content.ReadAsStringAsync();
-		}
-
-
-		public void Dispose()
-		{
-			client.Dispose();
 		}
 	}
 }

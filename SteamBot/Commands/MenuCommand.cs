@@ -21,11 +21,6 @@ namespace SteamBot.Commands
 			{
 				await client.SendTextMessage("This is menu", replyMarkup: Keys.GroupMenu, chatId: message.Chat);
 			}
-			else
-			{
-				//todo injector.createcommand<StartCommand>().Execute()
-				//new StartCommand()
-			}
 
 			return default;
 		}

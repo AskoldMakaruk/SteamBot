@@ -8,9 +8,8 @@ namespace Tests
 {
 	public class HelperTests
 	{
-		private int[] input;
-
 		private int[][] collection;
+		private int[] input;
 
 		[SetUp]
 		public void Setup()

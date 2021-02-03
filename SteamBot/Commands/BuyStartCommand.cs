@@ -92,7 +92,7 @@ namespace SteamBot.Commands
 			var buyer = _context.GetAccount(update);
 			var text = update.Text.Replace("/start", String.Empty).Trim();
 
-			var id = int.Parse(text);
+			var id = Int32.Parse(text);
 			var trade = await _context.Trades.FindAsync(id);
 
 			if (trade.Seller.Id == buyer.Id)

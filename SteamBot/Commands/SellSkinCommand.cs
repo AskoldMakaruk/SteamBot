@@ -15,15 +15,15 @@ namespace SteamBot.Commands
 {
 	public class SellSkinCommand : StaticCommand
 	{
-		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
+		private readonly SteamService _steamService;
 		private readonly long ChannelId;
 
 		public SellSkinCommand(SteamService steamService, TelegramContext context, IConfiguration configuration)
 		{
 			_steamService = steamService;
 			_context = context;
-			ChannelId = long.Parse(configuration["ChannelId"]);
+			ChannelId = Int64.Parse(configuration["ChannelId"]);
 		}
 
 		public override bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Sell") ?? false;
@@ -32,11 +32,11 @@ namespace SteamBot.Commands
 		{
 			var query = await client.GetCallbackQuery();
 			var account = _context.GetAccount(query.From);
-			var skin = await _context.Skins.FindAsync(int.Parse(query.Data.Split(' ')[0]));
+			var skin = await _context.Skins.FindAsync(Int32.Parse(query.Data.Split(' ')[0]));
 
 			account.CurrentTrade = new TradeItem
 			{
-				Skin = skin,
+				Skin = skin
 			};
 
 			await client.SendTextMessage(Texts.ResourceManager.GetString("EnterPrice"));
@@ -61,7 +61,7 @@ namespace SteamBot.Commands
 					{
 						Seller = account,
 						Status = TradeStatus.Open,
-						TradeItem = account.CurrentTrade,
+						TradeItem = account.CurrentTrade
 					};
 
 					await _context.Trades.AddAsync(trade);

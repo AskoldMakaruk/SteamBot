@@ -1,11 +1,11 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
-using SteamBot.Model;
-using Telegram.Bot.Types;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SteamBot.Model;
+using Telegram.Bot.Types;
 
 namespace SteamBot.Database
 {
@@ -83,7 +83,7 @@ namespace SteamBot.Database
 		public async Task<Skin> GetSkinAsync(CallbackQuery query)
 		{
 			var split = query.Data.Split(' ');
-			if (split.Length == 0 || !int.TryParse(split[0].Trim(), out var id))
+			if (split.Length == 0 || !Int32.TryParse(split[0].Trim(), out var id))
 			{
 				return null;
 			}
@@ -107,7 +107,10 @@ namespace SteamBot.Database
 				Username = user.Username
 			};
 			if (user.Username == null)
+			{
 				account.Username = user.FirstName + " " + user.LastName;
+			}
+
 			Accounts.Add(account);
 			SaveChanges();
 			return account;

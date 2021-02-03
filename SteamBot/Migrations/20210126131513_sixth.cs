@@ -2,67 +2,67 @@
 
 namespace SteamBot.Migrations
 {
-    public partial class sixth : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropIndex(
-                name: "IX_Skins_SkinName_WeaponName",
-                table: "Skins");
+	public partial class sixth : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropIndex(
+				"IX_Skins_SkinName_WeaponName",
+				"Skins");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "WeaponName",
-                table: "Skins",
-                type: "text",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+			migrationBuilder.AlterColumn<string>(
+				"WeaponName",
+				"Skins",
+				"text",
+				nullable: false,
+				defaultValue: "",
+				oldClrType: typeof(string),
+				oldType: "text",
+				oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
-                name: "SkinName",
-                table: "Skins",
-                type: "text",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+			migrationBuilder.AlterColumn<string>(
+				"SkinName",
+				"Skins",
+				"text",
+				nullable: false,
+				defaultValue: "",
+				oldClrType: typeof(string),
+				oldType: "text",
+				oldNullable: true);
 
-            migrationBuilder.AddUniqueConstraint(
-                name: "IX_Fullname",
-                table: "Skins",
-                columns: new[] { "SkinName", "WeaponName" });
-        }
+			migrationBuilder.AddUniqueConstraint(
+				"IX_Fullname",
+				"Skins",
+				new[] {"SkinName", "WeaponName"});
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropUniqueConstraint(
-                name: "IX_Fullname",
-                table: "Skins");
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropUniqueConstraint(
+				"IX_Fullname",
+				"Skins");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "WeaponName",
-                table: "Skins",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text");
+			migrationBuilder.AlterColumn<string>(
+				"WeaponName",
+				"Skins",
+				"text",
+				nullable: true,
+				oldClrType: typeof(string),
+				oldType: "text");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "SkinName",
-                table: "Skins",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text");
+			migrationBuilder.AlterColumn<string>(
+				"SkinName",
+				"Skins",
+				"text",
+				nullable: true,
+				oldClrType: typeof(string),
+				oldType: "text");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Skins_SkinName_WeaponName",
-                table: "Skins",
-                columns: new[] { "SkinName", "WeaponName" },
-                unique: true);
-        }
-    }
+			migrationBuilder.CreateIndex(
+				"IX_Skins_SkinName_WeaponName",
+				"Skins",
+				new[] {"SkinName", "WeaponName"},
+				unique: true);
+		}
+	}
 }

@@ -2,64 +2,64 @@
 
 namespace SteamBot.Migrations
 {
-    public partial class fourth : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<int>(
-                name: "ImageId",
-                table: "Skins",
-                type: "integer",
-                nullable: true);
+	public partial class fourth : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.AddColumn<int>(
+				"ImageId",
+				"Skins",
+				"integer",
+				nullable: true);
 
-            migrationBuilder.AddColumn<bool>(
-                name: "IsFloated",
-                table: "Skins",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
+			migrationBuilder.AddColumn<bool>(
+				"IsFloated",
+				"Skins",
+				"boolean",
+				nullable: false,
+				defaultValue: false);
 
-            migrationBuilder.AddColumn<double>(
-                name: "Price",
-                table: "Skins",
-                type: "double precision",
-                nullable: true);
+			migrationBuilder.AddColumn<double>(
+				"Price",
+				"Skins",
+				"double precision",
+				nullable: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Skins_ImageId",
-                table: "Skins",
-                column: "ImageId");
+			migrationBuilder.CreateIndex(
+				"IX_Skins_ImageId",
+				"Skins",
+				"ImageId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Skins_Images_ImageId",
-                table: "Skins",
-                column: "ImageId",
-                principalTable: "Images",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-        }
+			migrationBuilder.AddForeignKey(
+				"FK_Skins_Images_ImageId",
+				"Skins",
+				"ImageId",
+				"Images",
+				principalColumn: "Id",
+				onDelete: ReferentialAction.Restrict);
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Skins_Images_ImageId",
-                table: "Skins");
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropForeignKey(
+				"FK_Skins_Images_ImageId",
+				"Skins");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Skins_ImageId",
-                table: "Skins");
+			migrationBuilder.DropIndex(
+				"IX_Skins_ImageId",
+				"Skins");
 
-            migrationBuilder.DropColumn(
-                name: "ImageId",
-                table: "Skins");
+			migrationBuilder.DropColumn(
+				"ImageId",
+				"Skins");
 
-            migrationBuilder.DropColumn(
-                name: "IsFloated",
-                table: "Skins");
+			migrationBuilder.DropColumn(
+				"IsFloated",
+				"Skins");
 
-            migrationBuilder.DropColumn(
-                name: "Price",
-                table: "Skins");
-        }
-    }
+			migrationBuilder.DropColumn(
+				"Price",
+				"Skins");
+		}
+	}
 }

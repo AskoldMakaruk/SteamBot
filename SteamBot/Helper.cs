@@ -16,6 +16,15 @@ namespace SteamBot
 
 		public static ResourceManager ResourceManager => Texts.ResourceManager;
 
+		public static IFormatProvider Provider
+		{
+			get
+			{
+				var result = new NumberFormatInfo();
+				return result;
+			}
+		}
+
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
 			return Floats(culture).First(a => a.Value.Start <= value && value <= a.Value.End).Key;
@@ -112,16 +121,16 @@ namespace SteamBot
 			var HasDelimiter = hashName.Contains('|');
 			var marketHashName = hashName;
 
-			var IsKnife = marketHashName.Contains(Helper.Star);
+			var IsKnife = marketHashName.Contains(Star);
 			if (IsKnife)
 			{
-				marketHashName = marketHashName.Replace(Helper.Star, String.Empty).Trim();
+				marketHashName = marketHashName.Replace(Star, String.Empty).Trim();
 			}
 
-			var IsStatTrak = marketHashName.Contains(Helper.StatTrak);
+			var IsStatTrak = marketHashName.Contains(StatTrak);
 			if (IsStatTrak)
 			{
-				marketHashName = marketHashName.Replace(Helper.StatTrak, String.Empty).Trim();
+				marketHashName = marketHashName.Replace(StatTrak, String.Empty).Trim();
 			}
 
 			var delimiterIndx = marketHashName.IndexOf('|');
@@ -160,7 +169,7 @@ namespace SteamBot
 		{
 			//todo
 			//if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl))
-			return text == null ? null : Helper.Floats().First(a => text.Contains(a.Key)).Value.Start;
+			return text == null ? null : Floats().First(a => text.Contains(a.Key)).Value.End - 0.01f;
 		}
 
 
@@ -169,14 +178,5 @@ namespace SteamBot
 
 		public static float? GetFloat(this CallbackQuery query)
 			=> GetFloat(query.Data);
-
-		public static IFormatProvider Provider
-		{
-			get
-			{
-				var result = new NumberFormatInfo();
-				return result;
-			}
-		}
 	}
 }

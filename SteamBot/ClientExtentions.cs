@@ -25,7 +25,7 @@ namespace SteamBot
 		public static async Task<T> GetValue<T>(this IClient client)
 		{
 			var t = typeof(T);
-			if (!t.IsPrimitive && t != typeof(Decimal) && t != typeof(String))
+			if (!t.IsPrimitive && t != typeof(decimal) && t != typeof(string))
 			{
 				throw new NotSupportedException($"Type {t} is not supported");
 			}

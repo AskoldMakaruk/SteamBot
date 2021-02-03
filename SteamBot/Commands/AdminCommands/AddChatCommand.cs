@@ -35,7 +35,10 @@ namespace SteamBot.Commands.AdminCommands
 			var chat = update.Chat;
 
 			var account = _context.GetAccount(update);
-			if (!account.IsAdmin) return default;
+			if (!account.IsAdmin)
+			{
+				return default;
+			}
 
 			if (chat.Type != ChatType.Group)
 			{
@@ -56,7 +59,7 @@ namespace SteamBot.Commands.AdminCommands
 				["CanInviteUsers"] = false,
 				["CanPinMessages"] = false,
 				["CanChangeInfo"] = false,
-				["CanSendPolls"] = false,
+				["CanSendPolls"] = false
 			};
 
 			var builder = new StringBuilder();
@@ -97,7 +100,7 @@ namespace SteamBot.Commands.AdminCommands
 
 			//todo set pic
 			await client.SetChatTitle($"Trading room #{room.Id}", chat);
-			await client.SetChatDescription(chat, $"Some descrition was set by bot!");
+			await client.SetChatDescription(chat, "Some descrition was set by bot!");
 
 			var chats = _context.ChatRooms.ToList();
 			await client.SendTextMessage(text + $"\n\nTotal chat count: {chats.Count}\nFree: {chats.Count(a => a.TradeId == null)}", chat);

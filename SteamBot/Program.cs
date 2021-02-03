@@ -10,9 +10,9 @@ using SteamBot.Services;
 
 namespace SteamBot
 {
-	class Program
+	internal class Program
 	{
-		static void Main()
+		private static void Main()
 		{
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
 			//var json = File.ReadAllText("compact.json");
@@ -52,7 +52,7 @@ namespace SteamBot
 #if RELEASE
 			const string env = "Production";
 #endif
-			string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+			var assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 			return new ConfigurationBuilder()
 				.SetBasePath(Directory.GetCurrentDirectory())
 				.AddJsonFile($"{assemblyFolder}/appsettings.json", false, true)

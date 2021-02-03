@@ -3,101 +3,95 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SteamBot.Migrations
 {
-    public partial class InitialCreate : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
-                name: "Accounts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ChatId = table.Column<long>(type: "bigint", nullable: false),
-                    Username = table.Column<string>(type: "text", nullable: true),
-                    SteamId = table.Column<string>(type: "text", nullable: true),
-                    TradeUrl = table.Column<string>(type: "text", nullable: true),
-                    Locale = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
-                });
+	public partial class InitialCreate : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.CreateTable(
+				"Accounts",
+				table => new
+				{
+					Id = table.Column<int>("integer", nullable: false)
+						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					ChatId = table.Column<long>("bigint", nullable: false),
+					Username = table.Column<string>("text", nullable: true),
+					SteamId = table.Column<string>("text", nullable: true),
+					TradeUrl = table.Column<string>("text", nullable: true),
+					Locale = table.Column<string>("text", nullable: true)
+				},
+				constraints: table => { table.PrimaryKey("PK_Accounts", x => x.Id); });
 
-            migrationBuilder.CreateTable(
-                name: "TradeItem",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Item", x => x.Id);
-                });
+			migrationBuilder.CreateTable(
+				"TradeItem",
+				table => new
+				{
+					Id = table.Column<int>("integer", nullable: false)
+						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Name = table.Column<string>("text", nullable: true)
+				},
+				constraints: table => { table.PrimaryKey("PK_Item", x => x.Id); });
 
-            migrationBuilder.CreateTable(
-                name: "Trade",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ChannelPostId = table.Column<long>(type: "bigint", nullable: false),
-                    ItemId = table.Column<int>(type: "integer", nullable: true),
-                    BuyerId = table.Column<int>(type: "integer", nullable: true),
-                    SellerId = table.Column<int>(type: "integer", nullable: true),
-                    Status = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Trade", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Trade_Accounts_BuyerId",
-                        column: x => x.BuyerId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Trade_Accounts_SellerId",
-                        column: x => x.SellerId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Trade_Item_ItemId",
-                        column: x => x.ItemId,
-                        principalTable: "TradeItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+			migrationBuilder.CreateTable(
+				"Trade",
+				table => new
+				{
+					Id = table.Column<int>("integer", nullable: false)
+						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					ChannelPostId = table.Column<long>("bigint", nullable: false),
+					ItemId = table.Column<int>("integer", nullable: true),
+					BuyerId = table.Column<int>("integer", nullable: true),
+					SellerId = table.Column<int>("integer", nullable: true),
+					Status = table.Column<int>("integer", nullable: false)
+				},
+				constraints: table =>
+				{
+					table.PrimaryKey("PK_Trade", x => x.Id);
+					table.ForeignKey(
+						"FK_Trade_Accounts_BuyerId",
+						x => x.BuyerId,
+						"Accounts",
+						"Id",
+						onDelete: ReferentialAction.Restrict);
+					table.ForeignKey(
+						"FK_Trade_Accounts_SellerId",
+						x => x.SellerId,
+						"Accounts",
+						"Id",
+						onDelete: ReferentialAction.Restrict);
+					table.ForeignKey(
+						"FK_Trade_Item_ItemId",
+						x => x.ItemId,
+						"TradeItem",
+						"Id",
+						onDelete: ReferentialAction.Restrict);
+				});
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Trade_BuyerId",
-                table: "Trade",
-                column: "BuyerId");
+			migrationBuilder.CreateIndex(
+				"IX_Trade_BuyerId",
+				"Trade",
+				"BuyerId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Trade_ItemId",
-                table: "Trade",
-                column: "ItemId");
+			migrationBuilder.CreateIndex(
+				"IX_Trade_ItemId",
+				"Trade",
+				"ItemId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Trade_SellerId",
-                table: "Trade",
-                column: "SellerId");
-        }
+			migrationBuilder.CreateIndex(
+				"IX_Trade_SellerId",
+				"Trade",
+				"SellerId");
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "Trade");
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropTable(
+				"Trade");
 
-            migrationBuilder.DropTable(
-                name: "Accounts");
+			migrationBuilder.DropTable(
+				"Accounts");
 
-            migrationBuilder.DropTable(
-                name: "TradeItem");
-        }
-    }
+			migrationBuilder.DropTable(
+				"TradeItem");
+		}
+	}
 }

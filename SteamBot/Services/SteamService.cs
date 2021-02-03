@@ -111,7 +111,7 @@ namespace SteamBot.Services
 				skin.SteamItem = new SteamItem
 				{
 					Json = JsonConvert.SerializeObject(item),
-					Skin = skin,
+					Skin = skin
 				};
 				await _context.SteamItems.AddAsync(skin.SteamItem);
 			}

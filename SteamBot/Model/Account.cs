@@ -37,7 +37,7 @@ namespace SteamBot.Model
 		Open,
 		PriceConfirmation,
 		PaymentConfirmation,
-		Closed,
+		Closed
 	}
 
 	public class TradeItem

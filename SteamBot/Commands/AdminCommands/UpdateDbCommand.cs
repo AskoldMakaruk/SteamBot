@@ -12,8 +12,8 @@ namespace SteamBot.Commands.AdminCommands
 {
 	public class UpdateDbCommand : StaticCommand
 	{
-		private readonly SteamService _steamService;
 		private readonly TelegramContext _context;
+		private readonly SteamService _steamService;
 
 		public UpdateDbCommand(SteamService steamService, TelegramContext context)
 		{
@@ -27,7 +27,7 @@ namespace SteamBot.Commands.AdminCommands
 		{
 			var update = await client.GetUpdate();
 			var acccount = _context.GetAccount(update.Message);
-			
+
 			if (acccount == null || !acccount.IsAdmin)
 			{
 				return new Response();

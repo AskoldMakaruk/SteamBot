@@ -2,72 +2,72 @@
 
 namespace SteamBot.Migrations
 {
-    public partial class nineth : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_SteamItem_Skins_SkinId",
-                table: "SteamItem");
+	public partial class nineth : Migration
+	{
+		protected override void Up(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropForeignKey(
+				"FK_SteamItem_Skins_SkinId",
+				"SteamItem");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_SteamItem",
-                table: "SteamItem");
+			migrationBuilder.DropPrimaryKey(
+				"PK_SteamItem",
+				"SteamItem");
 
-            migrationBuilder.RenameTable(
-                name: "SteamItem",
-                newName: "SteamItems");
+			migrationBuilder.RenameTable(
+				"SteamItem",
+				newName: "SteamItems");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_SteamItem_SkinId",
-                table: "SteamItems",
-                newName: "IX_SteamItems_SkinId");
+			migrationBuilder.RenameIndex(
+				"IX_SteamItem_SkinId",
+				table: "SteamItems",
+				newName: "IX_SteamItems_SkinId");
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_SteamItems",
-                table: "SteamItems",
-                column: "Id");
+			migrationBuilder.AddPrimaryKey(
+				"PK_SteamItems",
+				"SteamItems",
+				"Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_SteamItems_Skins_SkinId",
-                table: "SteamItems",
-                column: "SkinId",
-                principalTable: "Skins",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
+			migrationBuilder.AddForeignKey(
+				"FK_SteamItems_Skins_SkinId",
+				"SteamItems",
+				"SkinId",
+				"Skins",
+				principalColumn: "Id",
+				onDelete: ReferentialAction.Cascade);
+		}
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_SteamItems_Skins_SkinId",
-                table: "SteamItems");
+		protected override void Down(MigrationBuilder migrationBuilder)
+		{
+			migrationBuilder.DropForeignKey(
+				"FK_SteamItems_Skins_SkinId",
+				"SteamItems");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_SteamItems",
-                table: "SteamItems");
+			migrationBuilder.DropPrimaryKey(
+				"PK_SteamItems",
+				"SteamItems");
 
-            migrationBuilder.RenameTable(
-                name: "SteamItems",
-                newName: "SteamItem");
+			migrationBuilder.RenameTable(
+				"SteamItems",
+				newName: "SteamItem");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_SteamItems_SkinId",
-                table: "SteamItem",
-                newName: "IX_SteamItem_SkinId");
+			migrationBuilder.RenameIndex(
+				"IX_SteamItems_SkinId",
+				table: "SteamItem",
+				newName: "IX_SteamItem_SkinId");
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_SteamItem",
-                table: "SteamItem",
-                column: "Id");
+			migrationBuilder.AddPrimaryKey(
+				"PK_SteamItem",
+				"SteamItem",
+				"Id");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_SteamItem_Skins_SkinId",
-                table: "SteamItem",
-                column: "SkinId",
-                principalTable: "Skins",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
-    }
+			migrationBuilder.AddForeignKey(
+				"FK_SteamItem_Skins_SkinId",
+				"SteamItem",
+				"SkinId",
+				"Skins",
+				principalColumn: "Id",
+				onDelete: ReferentialAction.Cascade);
+		}
+	}
 }

@@ -21,6 +21,21 @@ namespace SteamBot.Commands
 			}
 		}
 
+		public static ReplyKeyboardMarkup GroupMenu
+		{
+			get
+			{
+				ReplyKeyboardMarkup result = new[]
+				{
+					"Cancel Trade",
+					"Set price"
+				};
+				result.ResizeKeyboard = true;
+				result.OneTimeKeyboard = true;
+				return result;
+			}
+		}
+
 		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture)
 		{
 			if (!skin.IsFloated)
@@ -71,10 +86,10 @@ namespace SteamBot.Commands
 					CallbackData = $"{id} Buy",
 					Text = "Buy",
 					Url = $"https://t.me/{botName}?start={id}"
-				},
+				}
 			};
 		}
-		
+
 		public static InlineKeyboardMarkup GroupMarkup(string inviteLink)
 		{
 			return new[]
@@ -83,22 +98,8 @@ namespace SteamBot.Commands
 				{
 					Text = "Buy",
 					Url = inviteLink
-				},
+				}
 			};
-		}
-
-		public static ReplyKeyboardMarkup GroupMenu
-		{
-			get
-			{	ReplyKeyboardMarkup result =new[]
-				{
-					"Cancel Trade",
-					"Set price"
-				};
-				result.ResizeKeyboard = true;
-				result.OneTimeKeyboard = true;
-				return result;
-			}
 		}
 	}
 }
