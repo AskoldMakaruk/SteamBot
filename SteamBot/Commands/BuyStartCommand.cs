@@ -6,74 +6,10 @@ using BotFramework.Commands;
 using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Database;
-using SteamBot.Model;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace SteamBot.Commands
 {
-	public class AgreeOnPrice : StaticCommand
-	{
-		private readonly TelegramContext _context;
-
-		public AgreeOnPrice(TelegramContext context)
-		{
-			_context = context;
-		}
-
-		public override bool SuitableFirst(Update message)
-			=> message.Message?.Text == "Set price";
-
-		public override async Task<Response> Execute(IClient client)
-		{
-			var update = await client.GetTextMessage();
-			var chatRoom = _context.ChatRooms.FirstOrDefaultAsync(a => a.ChatId == update.Chat.Id);
-			await client.GetTextMessage();
-
-			return default;
-		}
-	}
-
-	public class CancelTradeCommand : StaticCommand
-	{
-		private readonly TelegramContext _context;
-
-		public CancelTradeCommand(TelegramContext context)
-		{
-			_context = context;
-		}
-
-		public override bool SuitableFirst(Update message)
-			=> message.Message?.Text == "Cancel Trade";
-
-		public override async Task<Response> Execute(IClient client)
-		{
-			var update = await client.GetUpdate();
-			await client.SendTextMessage("Are you sure? Send this text if you're absolutely sure:\n\n```\nI'm absolutely sure.\n```", parseMode: ParseMode.Markdown, chatId: update.Message.Chat);
-			await client.GetTradeCancelMessage();
-
-			var chatroom = await _context.ChatRooms.FirstOrDefaultAsync(a => a.ChatId == update.Message.Chat.Id);
-
-			var trade = chatroom.Trade;
-
-			await client.KickChatMember((int) trade.Seller.ChatId, chatroom.ChatId);
-			await client.KickChatMember((int) trade.Buyer.ChatId, chatroom.ChatId);
-
-			trade.Buyer = null;
-			trade.Room = null;
-			trade.Status = TradeStatus.Open;
-
-			chatroom.TradeId = null;
-
-			await _context.SaveChangesAsync();
-			//todo edit channelmessage
-			//trade.ChannelPostId
-
-			return default;
-		}
-	}
-
-
 	public class BuyStartCommand : StaticCommand
 	{
 		private readonly TelegramContext _context;
@@ -85,7 +21,7 @@ namespace SteamBot.Commands
 
 		public override bool SuitableFirst(Update message)
 			=> (message.Message?.Text?.StartsWith("/start") ?? false) && message.Message?.Text?.Length > "/start".Length;
-
+		
 		public override async Task<Response> Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
@@ -110,6 +46,7 @@ namespace SteamBot.Commands
 			var freeRoom = await _context.ChatRooms.FirstOrDefaultAsync(a => a.TradeId == null);
 			if (freeRoom == null)
 			{
+				await client.SendTextMessage("No free rooms");
 				//todo red flag for ilya
 				return default;
 			}

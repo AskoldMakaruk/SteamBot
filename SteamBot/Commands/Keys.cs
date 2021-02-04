@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using SteamBot.Localization;
 using SteamBot.Model;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -36,7 +37,7 @@ namespace SteamBot.Commands
 			}
 		}
 
-		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture)
+		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture, float? selectedFloat)
 		{
 			if (!skin.IsFloated)
 			{
@@ -46,10 +47,10 @@ namespace SteamBot.Commands
 			var to = skin.GetFloats(culture)
 				.Zip(skin.GetFloats("en-EN"))
 				.GroupElements(2)
-				.Select(a => a.Select(c => new InlineKeyboardButton
+				.Select(a => a.Select(c =>
 					{
-						CallbackData = $"{skin.Id} {c.Second}",
-						Text = c.First
+						var tick = selectedFloat != null && c.Second == Helper.GetFloatName((float) selectedFloat) ? "✅" : String.Empty;
+						return new InlineKeyboardButton {CallbackData = $"{skin.Id} {c.Second}", Text = $"{tick} {c.First}"};
 					})
 					.ToList())
 				.ToList();

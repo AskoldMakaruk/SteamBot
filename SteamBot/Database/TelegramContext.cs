@@ -74,7 +74,8 @@ namespace SteamBot.Database
 			skin.GetPrice(fl).Image = image;
 			using var client = new WebClient();
 			image.Bytes = await client.DownloadDataTaskAsync(new Uri(url));
-			await Images.AddAsync(image);
+			skin.SetImage(image, fl);
+
 			await SaveChangesAsync();
 
 			return image;

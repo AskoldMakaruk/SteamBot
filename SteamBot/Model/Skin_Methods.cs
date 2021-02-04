@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
 namespace SteamBot.Model
 {
@@ -18,14 +19,23 @@ namespace SteamBot.Model
 			return GetPrice(fl)?.Image;
 		}
 
+		public void SetImage(Image value, float? fl = null)
+		{
+			var price = GetPrice(fl);
+			if (price != null)
+			{
+				price.Image = value;
+			}
+		}
+
 		public SkinPrice GetPrice(float? fl = null)
 		{
 			if (fl == null)
 			{
-				return Prices.OrderBy(a => a.Float).First();
+				return Prices.OrderBy(a => a.Float).ThenBy(a => a.StatTrak).First();
 			}
 
-			return Prices.FirstOrDefault(a => a.FloatName == Helper.GetFloatName((float) fl));
+			return Prices.OrderBy(a => a.StatTrak).FirstOrDefault(a => a.FloatName == Helper.GetFloatName((float) fl));
 		}
 
 		public void ParseHashName(string hashName)
@@ -45,7 +55,7 @@ namespace SteamBot.Model
 			}
 
 			string priceTexts;
-			if (fl == 0)
+			if (fl is 0 or null)
 			{
 				var prices = GetPrices();
 				priceTexts = $"{prices.Min().ToString("F", CultureInfo.InvariantCulture)}$ - {prices.Max().ToString("F", CultureInfo.InvariantCulture)}$";
@@ -56,7 +66,7 @@ namespace SteamBot.Model
 			}
 
 
-			return $"*{SearchName}*\n{Helper.GetFloatName(fl ?? default)}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
+			return $"*{SearchName}*\n{(fl == null ? String.Empty : Helper.GetFloatName((float) fl))}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
 		}
 
 		public static Skin FromMessage()

@@ -167,9 +167,13 @@ namespace SteamBot
 
 		public static float? GetFloat(string text)
 		{
-			//todo
+			if (text == null) return null;
+			if (Floats().Any(a => text.Contains(a.Key)))
+			{
+				return Floats().First(a => text.Contains(a.Key)).Value.End - 0.01f;
+			}
 			//if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl))
-			return text == null ? null : Floats().First(a => text.Contains(a.Key)).Value.End - 0.01f;
+			return null;
 		}
 
 

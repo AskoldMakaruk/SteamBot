@@ -66,7 +66,7 @@ namespace SteamBot.Services
 						{
 							var floatName = Helper.FloatsNames().First(name => compact.Name.Contains(name));
 
-							price = item.Prices.FirstOrDefault(a => a.FloatName == floatName && a.StatTrak == statTrak);
+							price = item.Prices.FirstOrDefault(a => a.FloatName.Trim() == floatName.Trim() && a.StatTrak == statTrak);
 
 							if (price == null)
 							{

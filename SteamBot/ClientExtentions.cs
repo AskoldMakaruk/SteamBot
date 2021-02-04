@@ -69,7 +69,7 @@ namespace SteamBot
 			var image = skin.GetImage(fl);
 			await using MemoryStream stream = new(image.Bytes);
 
-			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU");
+			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU", null);
 
 			text ??= skin.ToMessage();
 

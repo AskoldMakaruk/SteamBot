@@ -25,6 +25,7 @@ namespace SteamBot.Model
 	public class SkinPrice
 	{
 		public int Id { get; set; }
+		public int SkinId { get; set; }
 		public bool? StatTrak { get; set; }
 		public float? Float { get; set; }
 		public string FloatName { get; set; }
