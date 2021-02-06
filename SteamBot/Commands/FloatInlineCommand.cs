@@ -40,6 +40,7 @@ namespace SteamBot.Commands
 				{
 					await client.AnswerCallbackQuery("Нет предмета с таким качеством.");
 				}
+
 				if (Equals(seletedFloat, fl))
 				{
 					seletedFloat = null;
@@ -49,20 +50,11 @@ namespace SteamBot.Commands
 					seletedFloat = fl;
 				}
 
-				var text = skin.ToMessage(fl:seletedFloat);
+				await client.UpdateSkin(query, skin, seletedFloat, query.Message.IsStatTrak());
+
 
 				//todo check if message 
 				//todo edit image?
-			
-
-				if (query.InlineMessageId != null)
-				{
-					await client.EditMessageCaption(query.InlineMessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU", seletedFloat));
-				}
-				else
-				{
-					await client.EditMessageCaption(query.Message.MessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU", seletedFloat));
-				}
 			}
 
 			return new Response();

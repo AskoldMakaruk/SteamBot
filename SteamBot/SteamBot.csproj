@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BotFramework" Version="0.5.0-dev-6" />
+    <!--<PackageReference Include="BotFramework" Version="0.5.0-dev-6" />-->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -41,6 +41,12 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BotFramework">
+      <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

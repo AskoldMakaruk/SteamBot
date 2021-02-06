@@ -2,16 +2,20 @@
 using System.IO;
 using System.Reflection;
 using BotFramework.Handlers;
+using Castle.DynamicProxy;
 using Microsoft.Extensions.Configuration;
 using Ninject.Modules;
 using SteamApi;
 using SteamBot.Database;
 using SteamBot.Services;
+using Telegram.Bot.Types;
 
 namespace SteamBot
 {
 	internal class Program
 	{
+		
+
 		private static void Main()
 		{
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");

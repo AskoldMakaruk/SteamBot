@@ -64,22 +64,6 @@ namespace SteamBot
 			}
 		}
 
-		public static async Task<Message> SendSkin(this IClient client, Skin skin, string text = null, float fl = default, IReplyMarkup replyMarkup = null, Chat? chatid = default)
-		{
-			var image = skin.GetImage(fl);
-			await using MemoryStream stream = new(image.Bytes);
-
-			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU", null);
-
-			text ??= skin.ToMessage();
-
-			if (chatid == null)
-			{
-				return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup);
-			}
-
-			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup, chatId: chatid);
-		}
 
 		public static async Task<Message> GetTradeCancelMessage(this IClient client)
 		{
@@ -89,6 +73,41 @@ namespace SteamBot
 		public static async Task<Message> GetTextMessage(this IClient client, Func<Message, bool> predicate)
 		{
 			return (await client.GetUpdate(update => update?.Message != null && predicate.Invoke(update.Message))).Message;
+		}
+
+		public static async Task<Message> SendSkin(this IClient client, Skin skin, string text = null, float? fl = default, IReplyMarkup replyMarkup = null, Chat? chatid = null)
+		{
+			var image = skin.GetImage(fl);
+			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU", fl, skin.Prices.Any(a => a.StatTrak == true) ? true : null);
+			text ??= skin.ToMessage();
+
+			ChatId chat = null;
+			if (chatid != null)
+			{
+				chat = chatid;
+			}
+
+			if (image == null)
+			{
+				return await client.SendTextMessage(text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup, chatId: chat);
+			}
+
+			await using MemoryStream stream = new(image.Bytes);
+			return await client.SendPhoto(new InputOnlineFile(stream, "skin.png"), caption: text, parseMode: ParseMode.Markdown, replyMarkup: replyMarkup, chatId: chat);
+		}
+
+		public static async Task UpdateSkin(this IClient client, CallbackQuery query, Skin skin, float? seletedFloat, bool? isStatTrak)
+		{
+			var text = skin.ToMessage(fl: seletedFloat, statTrak: isStatTrak);
+
+			if (query.InlineMessageId != null)
+			{
+				await client.EditMessageCaption(query.InlineMessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU", seletedFloat, isStatTrak));
+			}
+			else
+			{
+				await client.EditMessageCaption(query.Message.MessageId, text, parseMode: ParseMode.Markdown, replyMarkup: Keys.FloatMarkup(skin, "ru-RU", seletedFloat, isStatTrak));
+			}
 		}
 	}
 }

@@ -43,12 +43,12 @@ namespace SteamBot.Commands
 				if (skins.Count == 1 || sk is not null)
 				{
 					var skin = sk ?? skins.FirstOrDefault();
-					var fl = skin.Prices.OrderBy(a => a.Float).First().Float;
+					var fl = skin.GetPrice().Float;
 
-					if (skin.GetImage(fl) == null)
+					if (skin.GetImage(fl)?.Bytes == null)
 					{
 						await _steamService.GetSteamItem(skin, fl);
-						skin = await _context.Skins.FindAsync(skin.Id);
+						//skin = await _context.Skins.FindAsync(skin.Id);
 					}
 
 					await client.SendSkin(skin);

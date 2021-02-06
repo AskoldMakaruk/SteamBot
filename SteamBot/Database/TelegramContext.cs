@@ -65,17 +65,18 @@ namespace SteamBot.Database
 		public async Task<Image> GetImage(Skin skin, float? fl, string url = null)
 		{
 			var image = skin.GetImage(fl);
-			if (image != null || url == null)
+			if (image?.Bytes != null || url == null)
 			{
 				return image;
 			}
 
-			image = new Image();
+			image ??= new Image();
+
 			skin.GetPrice(fl).Image = image;
 			using var client = new WebClient();
 			image.Bytes = await client.DownloadDataTaskAsync(new Uri(url));
-			skin.SetImage(image, fl);
-
+			//skin.SetImage(image, fl);
+			await Images.AddAsync(image);
 			await SaveChangesAsync();
 
 			return image;

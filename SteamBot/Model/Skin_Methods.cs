@@ -28,14 +28,14 @@ namespace SteamBot.Model
 			}
 		}
 
-		public SkinPrice GetPrice(float? fl = null)
+		public SkinPrice GetPrice(float? fl = null, bool statTrak = false)
 		{
 			if (fl == null)
 			{
-				return Prices.OrderBy(a => a.Float).ThenBy(a => a.StatTrak).First();
+				return Prices.OrderByDescending(a => a.Float).ThenBy(a => a.StatTrak == statTrak).First();
 			}
 
-			return Prices.OrderBy(a => a.StatTrak).FirstOrDefault(a => a.FloatName == Helper.GetFloatName((float) fl));
+			return Prices.OrderByDescending(a => a.StatTrak == statTrak).FirstOrDefault(a => !IsFloated || a.FloatName == Helper.GetFloatName((float) fl));
 		}
 
 		public void ParseHashName(string hashName)
@@ -46,8 +46,11 @@ namespace SteamBot.Model
 			SearchName = $"{WeaponName} {SkinName}";
 		}
 
-		public string ToMessage(double? price = null, float? fl = null)
+		public bool StatTrakable => Prices.Any(a => a.StatTrak == true);
+
+		public string ToMessage(bool? statTrak = false, double? price = null, float? fl = null)
 		{
+			var stat = StatTrakable && (statTrak ?? false);
 			string priceTxt = null;
 			if (price != null)
 			{
@@ -55,18 +58,18 @@ namespace SteamBot.Model
 			}
 
 			string priceTexts;
-			if (fl is 0 or null)
+			if (fl is 0 or null && IsFloated && StatTrakable)
 			{
 				var prices = GetPrices();
 				priceTexts = $"{prices.Min().ToString("F", CultureInfo.InvariantCulture)}$ - {prices.Max().ToString("F", CultureInfo.InvariantCulture)}$";
 			}
 			else
 			{
-				priceTexts = $"{GetPrice(fl)?.Value.ToString("F", CultureInfo.InvariantCulture)}$";
+				priceTexts = $"{GetPrice(fl, stat)?.Value.ToString("F", CultureInfo.InvariantCulture)}$";
 			}
 
 
-			return $"*{SearchName}*\n{(fl == null ? String.Empty : Helper.GetFloatName((float) fl))}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
+			return $"*{(stat ? Helper.StatTrak : String.Empty)} {SearchName}*\n{(fl == null ? String.Empty : Helper.GetFloatName((float) fl))}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
 		}
 
 		public static Skin FromMessage()

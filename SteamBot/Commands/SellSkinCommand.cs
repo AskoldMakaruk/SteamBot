@@ -31,8 +31,18 @@ namespace SteamBot.Commands
 		public override async Task<Response> Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
-			var account = _context.GetAccount(query.From);
+
+			var fl = query.Message.GetFloat() ;
 			var skin = await _context.Skins.FindAsync(Int32.Parse(query.Data.Split(' ')[0]));
+
+			if (fl == null && skin.IsFloated)
+			{
+				await client.AnswerCallbackQuery(query.Id, "Select float please.");
+				return new();
+			}
+
+			var account = _context.GetAccount(query.From);
+		
 
 			account.CurrentTrade = new TradeItem
 			{
@@ -44,7 +54,7 @@ namespace SteamBot.Commands
 			account.CurrentTrade.Price = await client.GetValue<double>();
 
 
-			var fl = query.Message.GetFloat() ?? default;
+			
 
 			if (skin.GetImage(fl) == null)
 			{
@@ -68,7 +78,7 @@ namespace SteamBot.Commands
 					await _context.SaveChangesAsync();
 
 					var me = await client.GetMe();
-					var message = await client.SendSkin(skin, skin.ToMessage(account.CurrentTrade.Price, fl), replyMarkup: Keys.ChannelMarkup(trade.Id, me.Username), chatid: new Chat {Id = ChannelId}, fl: fl);
+					var message = await client.SendSkin(skin, skin.ToMessage(price: account.CurrentTrade.Price, fl: fl), replyMarkup: Keys.ChannelMarkup(trade.Id, me.Username), chatid: new Chat {Id = ChannelId}, fl: fl);
 
 					trade.ChannelPostId = message.MessageId;
 					await _context.SaveChangesAsync();

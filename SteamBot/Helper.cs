@@ -25,6 +25,11 @@ namespace SteamBot
 			}
 		}
 
+		public static bool IsStatTrak(this Message message) =>
+			(message?.Text ?? message?.Caption)?
+			.Split('\n')[0]
+			.Contains(Helper.StatTrak) ?? false;
+
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
 			return Floats(culture).First(a => a.Value.Start <= value && value <= a.Value.End).Key;
@@ -172,6 +177,7 @@ namespace SteamBot
 			{
 				return Floats().First(a => text.Contains(a.Key)).Value.End - 0.01f;
 			}
+
 			//if (Helper.TryGetFloatValue(floatString, out var fl) || Single.TryParse(floatString, NumberStyles.Any, Helper.Provider, out fl))
 			return null;
 		}

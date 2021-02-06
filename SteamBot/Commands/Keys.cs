@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SteamBot.Localization;
 using SteamBot.Model;
@@ -8,6 +9,8 @@ namespace SteamBot.Commands
 {
 	public static class Keys
 	{
+		public static readonly string Tick = "✅";
+
 		public static ReplyKeyboardMarkup ConfirmMarkup
 		{
 			get
@@ -37,43 +40,54 @@ namespace SteamBot.Commands
 			}
 		}
 
-		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture, float? selectedFloat)
+		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture, float? selectedFloat, bool? statTrak = false)
 		{
-			if (!skin.IsFloated)
+			var to = new List<List<InlineKeyboardButton>>();
+			if (skin.IsFloated)
 			{
-				return null;
+				to.AddRange(skin.GetFloats(culture)
+					.Zip(skin.GetFloats("en-EN"))
+					.GroupElements(2)
+					.Select(a => a.Select(c =>
+						{
+							var (first, second) = c;
+
+							var tick = selectedFloat != null && second == Helper.GetFloatName((float) selectedFloat) ? Tick : String.Empty;
+
+							return new InlineKeyboardButton {CallbackData = $"{skin.Id} {second}", Text = $"{tick} {first}"};
+						})
+						.ToList())
+					.ToList());
 			}
 
-			var to = skin.GetFloats(culture)
-				.Zip(skin.GetFloats("en-EN"))
-				.GroupElements(2)
-				.Select(a => a.Select(c =>
-					{
-						var tick = selectedFloat != null && c.Second == Helper.GetFloatName((float) selectedFloat) ? "✅" : String.Empty;
-						return new InlineKeyboardButton {CallbackData = $"{skin.Id} {c.Second}", Text = $"{tick} {c.First}"};
-					})
-					.ToList())
-				.ToList();
-
-			to.Add(new[]
+			if (statTrak != null)
 			{
-				//todo
-				//new InlineKeyboardButton
-				//{
-				//	CallbackData = $"{skin.Id} StatTrak",
-				//	Text = "StatTrak"
-				//},
-				new InlineKeyboardButton
+				to.Add(new List<InlineKeyboardButton>
 				{
-					CallbackData = $"{skin.Id} Buy",
-					Text = "Buy"
-				},
-				new InlineKeyboardButton
+					new()
+					{
+						CallbackData = $"{skin.Id} StatTrak",
+						Text = $"{(statTrak == true ? Tick : string.Empty)} StatTrak"
+					}
+				});
+			}
+
+			to.Add(
+				new List<InlineKeyboardButton>
 				{
-					CallbackData = $"{skin.Id} Sell",
-					Text = "Sell"
-				}
-			}.ToList());
+					new()
+					{
+						CallbackData = $"{skin.Id} Buy",
+						Text = "Buy"
+					},
+					new()
+					{
+						CallbackData = $"{skin.Id} Sell",
+						Text = "Sell"
+					}
+				});
+
+
 			var result = new InlineKeyboardMarkup(to);
 			return result;
 		}
