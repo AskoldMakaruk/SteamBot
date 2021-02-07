@@ -77,8 +77,8 @@ namespace SteamBot
 
 		public static async Task<Message> SendSkin(this IClient client, Skin skin, string text = null, float? fl = default, IReplyMarkup replyMarkup = null, Chat? chatid = null)
 		{
-			var image = skin.GetImage(fl);
-			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU", fl, skin.Prices.Any(a => a.StatTrak == true) ? true : null);
+			var image = skin.Prices.OrderBy(a => a.Float).FirstOrDefault(a => a.Image != null)?.Image;
+			replyMarkup ??= Keys.FloatMarkup(skin, "ru-RU", fl, skin.Prices.Any(a => a.StatTrak == true) ? false : null);
 			text ??= skin.ToMessage();
 
 			ChatId chat = null;

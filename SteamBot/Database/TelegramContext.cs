@@ -1,11 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using SteamBot.Model;
 using Telegram.Bot.Types;
+using Image = SteamBot.Model.Image;
 
 namespace SteamBot.Database
 {
@@ -75,6 +80,19 @@ namespace SteamBot.Database
 			skin.GetPrice(fl).Image = image;
 			using var client = new WebClient();
 			image.Bytes = await client.DownloadDataTaskAsync(new Uri(url));
+			using (SixLabors.ImageSharp.Image img = SixLabors.ImageSharp.Image.Load(image.Bytes))
+			{
+				img.Mutate(x => x.BackgroundColor(new Rgba32(51, 51, 51)));
+				await using (var memoryStream = new MemoryStream())
+				{
+					await img.SaveAsPngAsync(memoryStream);
+					await img.SaveAsPngAsync("image.png");
+					memoryStream.Seek(0, SeekOrigin.Begin);
+					image.Bytes = memoryStream.ToArray();
+				}
+			}
+
+
 			//skin.SetImage(image, fl);
 			await Images.AddAsync(image);
 			await SaveChangesAsync();

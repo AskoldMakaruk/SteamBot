@@ -28,8 +28,6 @@ namespace SteamBot.Commands
 
 		public override async Task<Response> Execute(IClient client)
 		{
-			//todo 2 buttons with stattrak/no stattral
-			//todo image background
 			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
 
 			var _ = await client.GetUpdate();

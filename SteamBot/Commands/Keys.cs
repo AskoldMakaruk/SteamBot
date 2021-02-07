@@ -60,7 +60,7 @@ namespace SteamBot.Commands
 					.ToList());
 			}
 
-			if (statTrak != null)
+			if (statTrak != null && skin.StatTrakable)
 			{
 				to.Add(new List<InlineKeyboardButton>
 				{
