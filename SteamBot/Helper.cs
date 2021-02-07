@@ -149,7 +149,7 @@ namespace SteamBot
 			}
 			else
 			{
-				skinName = WeaponName;
+				skinName = "";
 			}
 
 			return (WeaponName, skinName);

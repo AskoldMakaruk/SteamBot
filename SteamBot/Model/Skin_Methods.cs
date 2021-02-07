@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
 namespace SteamBot.Model
 {
@@ -10,7 +9,17 @@ namespace SteamBot.Model
 	{
 		public string GetHashName(float? fl) => GetHashName(fl == null ? GetFloats("en-EN").First() : Helper.GetFloatName((float) fl));
 		public string GetHashName(string fl) => $"{GetHashName()} {(IsFloated ? $"({fl})" : String.Empty)}";
-		private string GetHashName() => $"{(IsKnife ? Helper.Star : String.Empty)} {(IsStatTrak ? Helper.StatTrak : String.Empty)} {WeaponName} | {SkinName}";
+
+		private string GetHashName()
+		{
+			var attrs = $"{(IsKnife ? Helper.Star : String.Empty)} {(IsStatTrak ? Helper.StatTrak : String.Empty)}";
+			if (String.IsNullOrEmpty(SkinName) || WeaponName == SkinName)
+			{
+				return $"{attrs} {WeaponName}";
+			}
+
+			return $"{attrs} {WeaponName} | {SkinName}";
+		}
 
 		public List<double> GetPrices() => Prices.Select(a => a.Value).ToList();
 

@@ -43,4 +43,37 @@ namespace SteamBot.Commands.AdminCommands
 			return new Response();
 		}
 	}
+	public class DeleteOld : StaticCommand
+	{
+		private readonly TelegramContext _context;
+		private readonly SteamService _steamService;
+
+		public DeleteOld(SteamService steamService, TelegramContext context)
+		{
+			_steamService = steamService;
+			_context = context;
+		}
+
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/deleteold";
+
+		public override async Task<Response> Execute(IClient client)
+		{
+			var update = await client.GetUpdate();
+			var acccount = _context.GetAccount(update.Message);
+
+			if (acccount == null || !acccount.IsAdmin)
+			{
+				return new Response();
+			}
+
+			var count = _context.Skins.Count();
+			await client.SendTextMessage($"Skins count is {count}.");
+
+			await _context.DeleteOldSkins();
+			count = _context.Skins.Count();
+			await client.SendTextMessage($"New skins count is {count}.");
+
+			return new Response();
+		}
+	}
 }

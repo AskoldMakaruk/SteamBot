@@ -21,7 +21,7 @@ namespace SteamBot.Commands
 
 		public override bool SuitableFirst(Update message)
 			=> (message.Message?.Text?.StartsWith("/start") ?? false) && message.Message?.Text?.Length > "/start".Length;
-		
+
 		public override async Task<Response> Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
@@ -51,12 +51,15 @@ namespace SteamBot.Commands
 				return default;
 			}
 
+			freeRoom.InviteLink = await client.ExportChatInviteLink(freeRoom.ChatId);
+
 			trade.Room = freeRoom;
 			trade.Buyer = buyer;
 			await _context.SaveChangesAsync();
 
 			foreach (var userChat in new[] {client.UserId, trade.Seller.ChatId})
 			{
+				await client.UnbanChatMember((int) userChat, freeRoom.ChatId);
 				await client.SendTextMessage("Please, join this chat room to proceed:", userChat, replyMarkup: Keys.GroupMarkup(freeRoom.InviteLink));
 			}
 

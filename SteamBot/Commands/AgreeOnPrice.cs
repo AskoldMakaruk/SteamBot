@@ -39,7 +39,7 @@ namespace SteamBot.Commands
 				if (msg.From.Id == trade.Seller.ChatId)
 				{
 					double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice);
-				}	
+				}
 
 				if (msg.From.Id == trade.Buyer.ChatId)
 				{

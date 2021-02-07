@@ -1,13 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using SteamBot.Model;
 using Telegram.Bot.Types;
 using Image = SteamBot.Model.Image;
@@ -46,7 +42,7 @@ namespace SteamBot.Database
 
 			modelBuilder.Entity<Skin>(builder =>
 			{
-				builder.HasAlternateKey(c => new {c.SkinName, c.WeaponName}).HasName("IX_Fullname");
+				builder.HasAlternateKey(c => new { c.SkinName, c.WeaponName }).HasName("IX_Fullname");
 				builder.HasMany(a => a.TradeItems).WithOne(a => a.Skin);
 
 				builder.HasMany(a => a.Prices)
@@ -65,6 +61,12 @@ namespace SteamBot.Database
 			});
 
 			base.OnModelCreating(modelBuilder);
+		}
+
+		public async Task DeleteOldSkins()
+		{
+			Skins.RemoveRange(Skins.Where(a => a.WeaponName == a.SkinName));
+			await SaveChangesAsync();
 		}
 
 		public async Task<Image> GetImage(Skin skin, float? fl, string url = null)
