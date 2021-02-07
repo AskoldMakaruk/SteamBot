@@ -17,7 +17,7 @@ namespace SteamBot.Commands
 		public override async Task<Response> Execute(IClient client)
 		{
 			var message = await client.GetTextMessage();
-			if (message.Chat?.Type == ChatType.Group)
+			if (message.Chat?.Type == ChatType.Group || message.Chat?.Type == ChatType.Supergroup)
 			{
 				await client.SendTextMessage("This is menu", replyMarkup: Keys.GroupMenu, chatId: message.Chat);
 			}

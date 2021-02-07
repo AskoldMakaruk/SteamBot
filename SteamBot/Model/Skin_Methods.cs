@@ -19,15 +19,6 @@ namespace SteamBot.Model
 			return GetPrice(fl)?.Image;
 		}
 
-		public void SetImage(Image value, float? fl = null)
-		{
-			var price = GetPrice(fl);
-			if (price != null)
-			{
-				price.Image = value;
-			}
-		}
-
 		public SkinPrice GetPrice(float? fl = null, bool statTrak = false)
 		{
 			if (fl == null)
@@ -70,11 +61,6 @@ namespace SteamBot.Model
 
 
 			return $"*{(stat ? Helper.StatTrak : String.Empty)} {SearchName}*\n{(fl == null ? String.Empty : Helper.GetFloatName((float) fl))}\nSteam Market Price: {priceTexts}\n\n{priceTxt}";
-		}
-
-		public static Skin FromMessage()
-		{
-			return null;
 		}
 
 		public List<string> GetFloats(string culture)

@@ -34,14 +34,14 @@ namespace SteamBot.Commands
 			await client.SendTextMessage("Waiting for both participants to send price: ", chatRoom.ChatId);
 			do
 			{
-				var msg = await client.GetTextMessage(a => a.From.Id == trade.Seller.Id || a.From.Id == trade.Buyer.Id);
+				var msg = await client.GetTextMessage(a => a.From.Id == trade.Seller.ChatId || a.From.Id == trade.Buyer.ChatId);
 
-				if (msg.From.Id == trade.Seller.Id)
+				if (msg.From.Id == trade.Seller.ChatId)
 				{
 					double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice);
-				}
+				}	
 
-				if (msg.From.Id == trade.Buyer.Id)
+				if (msg.From.Id == trade.Buyer.ChatId)
 				{
 					double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out buyersPrice);
 				}

@@ -33,6 +33,7 @@ namespace SteamBot.Commands.AdminCommands
 		{
 			var update = await client.GetTextMessage();
 			var chat = update.Chat;
+			chat = await client.GetChat(chat);
 
 			var account = _context.GetAccount(update);
 			if (!account.IsAdmin)
@@ -40,7 +41,7 @@ namespace SteamBot.Commands.AdminCommands
 				return default;
 			}
 
-			if (chat.Type != ChatType.Group)
+			if (chat.Type != ChatType.Group && chat.Type != ChatType.Supergroup)
 			{
 				await client.SendTextMessage("Wrong chat type.", chat);
 				return default;
@@ -64,7 +65,7 @@ namespace SteamBot.Commands.AdminCommands
 
 			var builder = new StringBuilder();
 			var props = typeof(ChatPermissions).GetProperties();
-			chat = await client.GetChat(chat);
+			
 			foreach (var prop in props)
 			{
 				if (permissions[prop.Name] != (bool?) prop.GetValue(chat.Permissions))
@@ -83,24 +84,38 @@ namespace SteamBot.Commands.AdminCommands
 			string text;
 			if (room == null)
 			{
-				room = new ChatRoom
+				try
 				{
-					ChatId = chat.Id,
-					InviteLink = await client.ExportChatInviteLink(chat)
-				};
-				await _context.ChatRooms.AddAsync(room);
-				await _context.SaveChangesAsync();
-				text = "Chat added.";
+					room = new ChatRoom
+					{
+						ChatId = chat.Id,
+						InviteLink = await client.ExportChatInviteLink(chat)
+					};
+					await _context.ChatRooms.AddAsync(room);
+					await _context.SaveChangesAsync();
+					text = "Chat added.";
+				}
+				catch
+				{
+					await client.SendTextMessage("Bot doesn't have admin rights.");
+					return default;
+				}
 			}
 			else
 			{
 				text = "Chat is already in db.";
 			}
 
-
-			//todo set pic
-			await client.SetChatTitle($"Trading room #{room.Id}", chat);
-			await client.SetChatDescription(chat, "Some descrition was set by bot!");
+			try
+			{
+				//todo set pic
+				await client.SetChatTitle($"Trading room #{room.Id}", chat);
+				await client.SetChatDescription(chat, "Some descrition was set by bot!");
+			}
+			catch
+			{
+				//ignore
+			}
 
 			var chats = _context.ChatRooms.ToList();
 			await client.SendTextMessage(text + $"\n\nTotal chat count: {chats.Count}\nFree: {chats.Count(a => a.TradeId == null)}", chat);
