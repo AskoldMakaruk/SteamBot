@@ -40,6 +40,26 @@ namespace SteamBot.Commands
 			}
 		}
 
+		//todo locale
+		public static IReplyMarkup StartKeys()
+		{
+			ReplyKeyboardMarkup startkeys = new[]
+			{
+				new[]
+				{
+					Texts.NewTradeBtn,
+					Texts.MyTradesBtn
+				},
+				new[]
+				{
+					Texts.MyMoneyBtn,
+					Texts.MyStats
+				}
+			};
+			startkeys.ResizeKeyboard = true;
+			return startkeys;
+		}
+
 		public static InlineKeyboardMarkup FloatMarkup(Skin skin, string culture, float? selectedFloat, bool? statTrak = false)
 		{
 			var to = new List<List<InlineKeyboardButton>>();

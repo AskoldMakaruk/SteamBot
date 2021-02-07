@@ -42,22 +42,7 @@ namespace SteamBot.Commands
 				await _context.SaveChangesAsync();
 			}
 
-			ReplyKeyboardMarkup startkeys = new[]
-			{
-				new[]
-				{
-					Texts.NewTradeBtn,
-					Texts.MyTradesBtn
-				},
-				new[]
-				{
-					Texts.MyMoneyBtn,
-					Texts.MyStats
-				}
-			};
-			startkeys.ResizeKeyboard = true;
-
-			await client.SendTextMessage(Texts.StartText, replyMarkup: startkeys);
+			await client.SendTextMessage(Texts.StartText, replyMarkup: Keys.StartKeys());
 
 			return new Response();
 		}

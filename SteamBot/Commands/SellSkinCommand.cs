@@ -92,7 +92,7 @@ namespace SteamBot.Commands
 				}
 			}
 
-			await client.SendTextMessage(Texts.ResourceManager.GetString("TradeCreated"));
+			await client.SendTextMessage(Texts.ResourceManager.GetString("TradeCreated"),replyMarkup:Keys.StartKeys());
 			return new Response();
 		}
 	}
