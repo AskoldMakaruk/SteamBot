@@ -67,6 +67,9 @@
     <None Update=".gitignore">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="background.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="compact.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

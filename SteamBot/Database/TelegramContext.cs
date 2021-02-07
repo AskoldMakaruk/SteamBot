@@ -79,19 +79,8 @@ namespace SteamBot.Database
 
 			skin.GetPrice(fl).Image = image;
 			using var client = new WebClient();
-			image.Bytes = await client.DownloadDataTaskAsync(new Uri(url));
-			using (SixLabors.ImageSharp.Image img = SixLabors.ImageSharp.Image.Load(image.Bytes))
-			{
-				img.Mutate(x => x.BackgroundColor(new Rgba32(51, 51, 51)));
-				await using (var memoryStream = new MemoryStream())
-				{
-					await img.SaveAsPngAsync(memoryStream);
-					await img.SaveAsPngAsync("image.png");
-					memoryStream.Seek(0, SeekOrigin.Begin);
-					image.Bytes = memoryStream.ToArray();
-				}
-			}
 
+			image.Bytes = await ImageHelper.ProcessImage(await client.DownloadDataTaskAsync(new Uri(url)));
 
 			//skin.SetImage(image, fl);
 			await Images.AddAsync(image);
