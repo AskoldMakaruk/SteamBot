@@ -16,7 +16,8 @@ namespace Tests
 			prices = new();
 			skin = new Skin()
 			{
-				Prices = prices
+				Prices = prices,
+				IsFloated = true
 			};
 
 			prices.AddRange(

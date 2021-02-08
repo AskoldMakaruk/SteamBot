@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
@@ -43,6 +44,43 @@ namespace SteamBot.Commands.AdminCommands
 			return new Response();
 		}
 	}
+
+	public class CloseAllTrades : StaticCommand
+	{
+		private readonly TelegramContext _context;
+
+		public CloseAllTrades(TelegramContext context)
+		{
+			_context = context;
+		}
+
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/closetrades";
+
+		public override async Task<Response> Execute(IClient client)
+		{
+			var update = await client.GetUpdate();
+			var acccount = _context.GetAccount(update.Message);
+
+			if (acccount == null || !acccount.IsAdmin)
+			{
+				return new Response();
+			}
+
+			var rooms = _context.ChatRooms.ToList();
+			foreach (var room in rooms)
+			{
+				room.Trade.Room = null;
+				room.Trade = null;
+				room.TradeId = null;
+			}
+
+			await _context.SaveChangesAsync();
+			await client.SendTextMessage($"Free rooms {rooms.Count}.");
+
+			return new Response();
+		}
+	}
+
 	public class DeleteOld : StaticCommand
 	{
 		private readonly TelegramContext _context;

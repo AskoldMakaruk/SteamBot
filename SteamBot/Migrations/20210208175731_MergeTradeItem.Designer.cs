@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SteamBot.Database;
@@ -9,9 +10,10 @@ using SteamBot.Database;
 namespace SteamBot.Migrations
 {
     [DbContext(typeof(TelegramContext))]
-    partial class TelegramContextModelSnapshot : ModelSnapshot
+    [Migration("20210208175731_MergeTradeItem")]
+    partial class MergeTradeItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -18,7 +18,7 @@ namespace SteamBot.Model
 		public DateTime CreateTS { get; set; }
 		public DateTime UpdateTS { get; set; }
 
-		public virtual ICollection<TradeItem> TradeItems { get; set; } = new HashSet<TradeItem>();
+		public virtual ICollection<Trade> Trades { get; set; } = new HashSet<Trade>();
 		public virtual ICollection<SkinPrice> Prices { get; set; } = new HashSet<SkinPrice>();
 	}
 

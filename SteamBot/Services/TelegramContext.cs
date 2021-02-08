@@ -14,7 +14,6 @@ namespace SteamBot.Database
 	{
 		public DbSet<Account> Accounts { get; set; }
 		public DbSet<Image> Images { get; set; }
-		public DbSet<TradeItem> Items { get; set; }
 		public DbSet<Skin> Skins { get; set; }
 		public DbSet<Trade> Trades { get; set; }
 		public DbSet<SteamItem> SteamItems { get; set; }
@@ -43,7 +42,7 @@ namespace SteamBot.Database
 			modelBuilder.Entity<Skin>(builder =>
 			{
 				builder.HasAlternateKey(c => new { c.SkinName, c.WeaponName }).HasName("IX_Fullname");
-				builder.HasMany(a => a.TradeItems).WithOne(a => a.Skin);
+				builder.HasMany(a => a.Trades).WithOne(a => a.Skin);
 
 				builder.HasMany(a => a.Prices)
 					.WithOne(a => a.Skin);

@@ -7,6 +7,7 @@ using BotFramework.Commands;
 using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Database;
+using SteamBot.Model;
 using Telegram.Bot.Types;
 
 namespace SteamBot.Commands
@@ -23,6 +24,7 @@ namespace SteamBot.Commands
 		public override bool SuitableFirst(Update message)
 			=> message.Message?.Text == "Set price";
 
+		//todo redo with db save
 		public override async Task<Response> Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
@@ -38,17 +40,24 @@ namespace SteamBot.Commands
 
 				if (msg.From.Id == trade.Seller.ChatId)
 				{
-					double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice);
+					if (double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice))
+					{
+						trade.SellerPrice = sellersPrice;
+					}
 				}
 
 				if (msg.From.Id == trade.Buyer.ChatId)
 				{
-					double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out buyersPrice);
+					if (double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out buyersPrice))
+					{
+						trade.BuyerPrice = buyersPrice;
+					}
 				}
 			} while (Math.Abs(sellersPrice - buyersPrice) > 0.0001);
 
+			trade.Status = TradeStatus.PaymentConfirmation; // todo idk
 
-			trade.TradeItem.Price = buyersPrice;
+
 			await client.SendTextMessage("Price set", chatRoom.ChatId);
 			await client.SendTextMessage("Please send item of money yeah", chatRoom.ChatId);
 			await _context.SaveChangesAsync();

@@ -18,39 +18,42 @@ namespace SteamBot.Model
 		public virtual ICollection<Trade> Buys { get; set; } = new HashSet<Trade>();
 
 		[NotMapped]
-		public TradeItem CurrentTrade { get; set; }
+		public Trade CurrentTrade { get; set; }
 	}
 
 	public class Trade
 	{
 		public int Id { get; set; }
 		public long ChannelPostId { get; set; }
+		public float Float { get; set; }
+		public double StartPrice { get; set; }
+		public double? SellerPrice { get; set; }
+		public double? BuyerPrice { get; set; }
+
+		public virtual Skin Skin { get; set; }
 		public virtual ChatRoom Room { get; set; }
-		public virtual TradeItem TradeItem { get; set; }
 		public virtual Account Buyer { get; set; }
 		public virtual Account Seller { get; set; }
 		public virtual TradeStatus Status { get; set; }
-	}
 
-	public enum TradeStatus
-	{
-		Open,
-		PriceConfirmation,
-		PaymentConfirmation,
-		Closed
-	}
 
-	public class TradeItem
-	{
-		public int Id { get; set; }
-		public float Float { get; set; }
-		public double Price { get; set; }
-		public virtual Skin Skin { get; set; }
+		public double CurrentPrice => SellerPrice ?? BuyerPrice ?? StartPrice;
 
 		public Image Image => Skin.GetImage(Float);
 
 		public string HashName => Skin.GetHashName(Float);
 		public double? MarketPrice => Skin.GetPrice(Float).Value;
+	}
+
+	public enum TradeStatus
+	{
+		Open,
+		WaitingForParticipantsToJoin,
+		Discussion,
+		
+		PriceConfirmation,
+		PaymentConfirmation,
+		Closed
 	}
 
 	public class SteamItem

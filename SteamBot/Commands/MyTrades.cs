@@ -22,7 +22,7 @@ namespace SteamBot.Commands
 			_context = context;
 		}
 
-		public override bool SuitableFirst(Update message) => message.Message.Text == Texts.MyTradesBtn;
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == Texts.MyTradesBtn;
 
 		public override async Task<Response> Execute(IClient client)
 		{
@@ -30,8 +30,7 @@ namespace SteamBot.Commands
 			var account = _context.GetAccount(update);
 
 			var trades = _context.Trades
-				.Include(a => a.TradeItem)
-				.ThenInclude(a => a.Skin)
+				.Include(a => a.Skin)
 				.ThenInclude(a => a.Prices)
 				.Where(a => a.Seller.Id == account.Id || a.Buyer.Id == account.Id)
 				.ToList();
@@ -40,11 +39,10 @@ namespace SteamBot.Commands
 			for (var i = 0; i < trades.Count; i++)
 			{
 				var trade = trades[i];
-				var item = trade.TradeItem;
-				var skin = item.Skin;
+				var skin = trade.Skin;
 				var roomLink = trade.Room != null ? $"[Trade chat]({trade.Room.InviteLink})\n" : "";
 
-				builder.AppendFormat("{0}. *{1}*\nFor: ${2}\nStatus: {3}\n{4}\n", i + 1, skin.SearchName, trade.TradeItem.Price, trade.Status, roomLink);
+				builder.AppendFormat("{0}. *{1}*\nFor: ${2}\nStatus: {3}\n{4}\n", i + 1, skin.SearchName, trade.StartPrice, trade.Status, roomLink);
 			}
 
 			var text = builder.ToString();

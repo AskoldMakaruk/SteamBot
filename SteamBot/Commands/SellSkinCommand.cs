@@ -44,14 +44,16 @@ namespace SteamBot.Commands
 			var account = _context.GetAccount(query.From);
 		
 
-			account.CurrentTrade = new TradeItem
+			account.CurrentTrade = new Trade
 			{
-				Skin = skin
+				Skin = skin,
+				Seller = account,
+				Status = TradeStatus.Open,
 			};
 
 			await client.SendTextMessage(Texts.ResourceManager.GetString("EnterPrice"));
 
-			account.CurrentTrade.Price = await client.GetValue<double>();
+			account.CurrentTrade.StartPrice = await client.GetValue<double>();
 
 
 			
@@ -67,18 +69,12 @@ namespace SteamBot.Commands
 			{
 				try
 				{
-					var trade = new Trade
-					{
-						Seller = account,
-						Status = TradeStatus.Open,
-						TradeItem = account.CurrentTrade
-					};
-
+					var trade = account.CurrentTrade;
 					await _context.Trades.AddAsync(trade);
 					await _context.SaveChangesAsync();
 
 					var me = await client.GetMe();
-					var message = await client.SendSkin(skin, skin.ToMessage(price: account.CurrentTrade.Price, fl: fl), replyMarkup: Keys.ChannelMarkup(trade.Id, me.Username), chatid: new Chat {Id = ChannelId}, fl: fl);
+					var message = await client.SendSkin(skin, skin.ToMessage(price: account.CurrentTrade.StartPrice, fl: fl), replyMarkup: Keys.ChannelMarkup(trade.Id, me.Username), chatid: new Chat {Id = ChannelId}, fl: fl);
 
 					trade.ChannelPostId = message.MessageId;
 					await _context.SaveChangesAsync();
