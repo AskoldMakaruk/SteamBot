@@ -6,7 +6,7 @@ using BotFramework.Commands;
 using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SteamBot.Database;
+using SteamBot.Services;
 using Telegram.Bot.Types;
 
 namespace SteamBot.Commands

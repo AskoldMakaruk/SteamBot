@@ -6,7 +6,6 @@ using BotFramework.Clients;
 using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
-using SteamBot.Database;
 using SteamBot.Model;
 using SteamBot.Services;
 using Telegram.Bot.Types;

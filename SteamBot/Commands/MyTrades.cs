@@ -6,8 +6,8 @@ using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
-using SteamBot.Database;
 using SteamBot.Localization;
+using SteamBot.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 

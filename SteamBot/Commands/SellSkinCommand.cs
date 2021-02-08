@@ -5,7 +5,6 @@ using BotFramework.Clients.ClientExtensions;
 using BotFramework.Commands;
 using BotFramework.Responses;
 using Microsoft.Extensions.Configuration;
-using SteamBot.Database;
 using SteamBot.Localization;
 using SteamBot.Model;
 using SteamBot.Services;

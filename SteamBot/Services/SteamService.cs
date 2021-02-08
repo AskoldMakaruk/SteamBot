@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SteamApi;
 using SteamApi.Model;
-using SteamBot.Database;
 using SteamBot.Model;
 
 namespace SteamBot.Services

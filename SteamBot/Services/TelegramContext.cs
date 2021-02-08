@@ -8,7 +8,7 @@ using SteamBot.Model;
 using Telegram.Bot.Types;
 using Image = SteamBot.Model.Image;
 
-namespace SteamBot.Database
+namespace SteamBot.Services
 {
 	public class TelegramContext : DbContext
 	{
