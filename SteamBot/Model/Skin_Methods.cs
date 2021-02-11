@@ -7,6 +7,7 @@ namespace SteamBot.Model
 {
 	public partial class Skin
 	{
+		public bool StatTrakable => Prices.Any(a => a.StatTrak == true);
 		public string GetHashName(float? fl) => GetHashName(fl == null ? GetFloats("en-EN").First() : Helper.GetFloatName((float) fl));
 		public string GetHashName(string fl) => $"{GetHashName()} {(IsFloated ? $"({fl})" : String.Empty)}";
 
@@ -45,8 +46,6 @@ namespace SteamBot.Model
 			(WeaponName, SkinName) = Helper.GetNormalizedName(hashName);
 			SearchName = $"{WeaponName} {SkinName}";
 		}
-
-		public bool StatTrakable => Prices.Any(a => a.StatTrak == true);
 
 		public string ToMessage(bool? statTrak = false, double? price = null, float? fl = null)
 		{

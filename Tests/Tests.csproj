@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.3" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
@@ -14,6 +15,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SteamBot\SteamBot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BotFramework">
+      <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="BotFramework.Abstractions">
+      <HintPath>..\..\BotFramework\BotFramework.Abstractions\bin\Debug\netstandard2.1\BotFramework.Abstractions.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

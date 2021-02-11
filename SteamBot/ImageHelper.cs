@@ -10,7 +10,7 @@ namespace SteamBot
 		public static async Task<byte[]> ProcessImage(byte[] imageBytes)
 		{
 			var backImg = await Image.LoadAsync(@"background.png");
-			var skinImg = Image.Load(imageBytes);	
+			var skinImg = Image.Load(imageBytes);
 
 			var size = skinImg.Size();
 			skinImg.Mutate(a => a.Resize(size * 360 / size.Width));

@@ -1,8 +1,6 @@
 ﻿using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Model;
 using SteamBot.Services;
@@ -13,9 +11,9 @@ namespace SteamBot.Commands
 {
 	public class CancelTradeCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 
-		public CancelTradeCommand(TelegramContext context)
+		public CancelTradeCommand(Database context)
 		{
 			_context = context;
 		}
@@ -23,7 +21,7 @@ namespace SteamBot.Commands
 		public override bool SuitableFirst(Update message)
 			=> message.Message?.Text == "Cancel Trade";
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetUpdate();
 			await client.SendTextMessage("Are you sure? Send this text if you're absolutely sure:\n\n```\nI'm absolutely sure.\n```", parseMode: ParseMode.Markdown, chatId: update.Message.Chat);
@@ -45,8 +43,6 @@ namespace SteamBot.Commands
 			await _context.SaveChangesAsync();
 			//todo edit channelmessage
 			//trade.ChannelPostId
-
-			return default;
 		}
 	}
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Services;
 using Telegram.Bot.Types;
@@ -12,9 +10,9 @@ namespace SteamBot.Commands
 {
 	public class BuyStartCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 
-		public BuyStartCommand(TelegramContext context)
+		public BuyStartCommand(Database context)
 		{
 			_context = context;
 		}
@@ -22,7 +20,7 @@ namespace SteamBot.Commands
 		public override bool SuitableFirst(Update message)
 			=> (message.Message?.Text?.StartsWith("/start") ?? false) && message.Message?.Text?.Length > "/start".Length;
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
 			var buyer = _context.GetAccount(update);
@@ -34,13 +32,13 @@ namespace SteamBot.Commands
 			if (trade.Seller.Id == buyer.Id)
 			{
 				await client.SendTextMessage("Very funny...");
-				return default;
+				return;
 			}
 
 			if (trade.Buyer != null)
 			{
 				await client.SendTextMessage("This trade is already in progress. Soryy");
-				return default;
+				return;
 			}
 
 			var freeRoom = await _context.ChatRooms.FirstOrDefaultAsync(a => a.TradeId == null);
@@ -48,7 +46,7 @@ namespace SteamBot.Commands
 			{
 				await client.SendTextMessage("No free rooms");
 				//todo red flag for ilya
-				return default;
+				return;
 			}
 
 			freeRoom.InviteLink = await client.ExportChatInviteLink(freeRoom.ChatId);
@@ -65,8 +63,6 @@ namespace SteamBot.Commands
 
 			//await client.SendTextMessage($"Someone wants to buy {trade.TradeItem.Skin.SearchName}. Do you accept?", replyMarkup: Keys.ConfirmBuyer(update.From.Id), chatId: trade.Seller.ChatId);
 			//await client.SendTextMessage("We notified seller about you. Wait for his reply, please.");
-
-			return default;
 		}
 	}
 }

@@ -1,21 +1,18 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using SteamBot.Services;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace SteamBot.Commands
 {
 	public class FloatInlineCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 		private readonly SteamService _steamService;
 
-		public FloatInlineCommand(SteamService steamService, TelegramContext context)
+		public FloatInlineCommand(SteamService steamService, Database context)
 		{
 			_steamService = steamService;
 			_context = context;
@@ -23,7 +20,7 @@ namespace SteamBot.Commands
 
 		public override bool SuitableFirst(Update message) => Helper.FloatsNames().Any(a => message?.CallbackQuery?.Data?.Contains(a) ?? false);
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
 			var skin = await _context.GetSkinAsync(query);
@@ -55,8 +52,6 @@ namespace SteamBot.Commands
 				//todo check if message 
 				//todo edit image?
 			}
-
-			return new Response();
 		}
 	}
 }

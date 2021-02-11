@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SteamBot.Services;
@@ -13,10 +11,10 @@ namespace SteamBot.Commands
 {
 	public class JoinChatCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 		private readonly long ChannelId;
 
-		public JoinChatCommand(TelegramContext context, IConfiguration configuration)
+		public JoinChatCommand(Database context, IConfiguration configuration)
 		{
 			_context = context;
 			ChannelId = Int64.Parse(configuration["ChannelId"]);
@@ -25,7 +23,7 @@ namespace SteamBot.Commands
 
 		public override bool SuitableFirst(Update message) => message.Message?.NewChatMembers?.Length > 0;
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetUpdate();
 			var chat = update.Message.Chat;
@@ -34,7 +32,7 @@ namespace SteamBot.Commands
 			//ignore uninitialized chats
 			if (chatRoom == null)
 			{
-				return default;
+				return;
 			}
 
 			try
@@ -54,7 +52,7 @@ namespace SteamBot.Commands
 			try
 			{
 				//todo client channel edit message
-				await client.ForwardMessage(ChannelId, (int)chatRoom.Trade.ChannelPostId, chat);
+				await client.ForwardMessage(ChannelId, (int) chatRoom.Trade.ChannelPostId, chat);
 			}
 			catch (Exception e)
 			{
@@ -63,9 +61,6 @@ namespace SteamBot.Commands
 
 			await _context.SaveChangesAsync();
 			await client.SendTextMessage("Start trading guys..", chat);
-
-
-			return default;
 		}
 	}
 }

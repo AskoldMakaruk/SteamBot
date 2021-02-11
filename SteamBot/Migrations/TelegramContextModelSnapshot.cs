@@ -8,7 +8,7 @@ using SteamBot.Services;
 
 namespace SteamBot.Migrations
 {
-    [DbContext(typeof(TelegramContext))]
+    [DbContext(typeof(Database))]
     partial class TelegramContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

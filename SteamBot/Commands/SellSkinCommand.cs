@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.Extensions.Configuration;
 using SteamBot.Localization;
 using SteamBot.Model;
@@ -14,11 +12,11 @@ namespace SteamBot.Commands
 {
 	public class SellSkinCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 		private readonly SteamService _steamService;
 		private readonly long ChannelId;
 
-		public SellSkinCommand(SteamService steamService, TelegramContext context, IConfiguration configuration)
+		public SellSkinCommand(SteamService steamService, Database context, IConfiguration configuration)
 		{
 			_steamService = steamService;
 			_context = context;
@@ -27,35 +25,33 @@ namespace SteamBot.Commands
 
 		public override bool SuitableFirst(Update message) => message?.CallbackQuery?.Data.Contains("Sell") ?? false;
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var query = await client.GetCallbackQuery();
 
-			var fl = query.Message.GetFloat() ;
+			var fl = query.Message.GetFloat();
 			var skin = await _context.Skins.FindAsync(Int32.Parse(query.Data.Split(' ')[0]));
 
 			if (fl == null && skin.IsFloated)
 			{
 				await client.AnswerCallbackQuery(query.Id, "Select float please.");
-				return new();
+				return;
 			}
 
 			var account = _context.GetAccount(query.From);
-		
+
 
 			account.CurrentTrade = new Trade
 			{
 				Skin = skin,
 				Seller = account,
-				Status = TradeStatus.Open,
+				Status = TradeStatus.Open
 			};
 
 			await client.SendTextMessage(Texts.ResourceManager.GetString("EnterPrice"));
 
 			account.CurrentTrade.StartPrice = await client.GetValue<double>();
 
-
-			
 
 			if (skin.GetImage(fl) == null)
 			{
@@ -87,8 +83,7 @@ namespace SteamBot.Commands
 				}
 			}
 
-			await client.SendTextMessage(Texts.ResourceManager.GetString("TradeCreated"),replyMarkup:Keys.StartKeys());
-			return new Response();
+			await client.SendTextMessage(Texts.ResourceManager.GetString("TradeCreated"), replyMarkup: Keys.StartKeys());
 		}
 	}
 }

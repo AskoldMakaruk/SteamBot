@@ -4,6 +4,7 @@ using System.Linq;
 using SteamBot.Localization;
 using SteamBot.Model;
 using Telegram.Bot.Types.ReplyMarkups;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
@@ -47,7 +48,7 @@ namespace SteamBot.Commands
 			{
 				new[]
 				{
-					Texts.NewTradeBtn,
+					Locales["EN"]["NewTradeBtn"],
 					Texts.MyTradesBtn
 				},
 				new[]
@@ -87,7 +88,7 @@ namespace SteamBot.Commands
 					new()
 					{
 						CallbackData = $"{skin.Id} StatTrak",
-						Text = $"{(statTrak == true ? Tick : string.Empty)} StatTrak"
+						Text = $"{(statTrak == true ? Tick : String.Empty)} StatTrak"
 					}
 				});
 			}

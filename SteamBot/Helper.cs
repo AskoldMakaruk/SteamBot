@@ -28,7 +28,7 @@ namespace SteamBot
 		public static bool IsStatTrak(this Message message) =>
 			(message?.Text ?? message?.Caption)?
 			.Split('\n')[0]
-			.Contains(Helper.StatTrak) ?? false;
+			.Contains(StatTrak) ?? false;
 
 		public static string GetFloatName(float value, string culture = "en-EN")
 		{
@@ -120,6 +120,31 @@ namespace SteamBot
 			}
 		}
 
+		public static IEnumerable<TResult> FullOuterJoin<TA, TB, TKey, TResult>(
+			this IEnumerable<TA> a,
+			IEnumerable<TB> b,
+			Func<TA, TKey> selectKeyA,
+			Func<TB, TKey> selectKeyB,
+			Func<TA, TB, TKey, TResult> projection,
+			TA defaultA = default(TA),
+			TB defaultB = default(TB),
+			IEqualityComparer<TKey> cmp = null)
+		{
+			cmp ??= EqualityComparer<TKey>.Default;
+			var alookup = a.ToLookup(selectKeyA, cmp);
+			var blookup = b.ToLookup(selectKeyB, cmp);
+
+			var keys = new HashSet<TKey>(alookup.Select(p => p.Key), cmp);
+			keys.UnionWith(blookup.Select(p => p.Key));
+
+			var join = from key in keys
+				from xa in alookup[key].DefaultIfEmpty(defaultA)
+				from xb in blookup[key].DefaultIfEmpty(defaultB)
+				select projection(xa, xb, key);
+
+			return join;
+		}
+
 		public static (string WeaponName, string SkinName) GetNormalizedName(string hashName)
 		{
 			var IsFloated = Helper.IsFloated(hashName);
@@ -172,7 +197,11 @@ namespace SteamBot
 
 		public static float? GetFloat(string text)
 		{
-			if (text == null) return null;
+			if (text == null)
+			{
+				return null;
+			}
+
 			if (Floats().Any(a => text.Contains(a.Key)))
 			{
 				return Floats().First(a => text.Contains(a.Key)).Value.End - 0.01f;

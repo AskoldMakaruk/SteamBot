@@ -3,7 +3,7 @@ using NUnit.Framework;
 using SteamBot;
 using SteamBot.Model;
 
-namespace Tests
+namespace Tests.Utilities
 {
 	public class GetPriceTests
 	{

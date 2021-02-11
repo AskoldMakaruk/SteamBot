@@ -9,7 +9,7 @@ using SteamBot.Services;
 
 namespace SteamBot.Migrations
 {
-    [DbContext(typeof(TelegramContext))]
+    [DbContext(typeof(Database))]
     [Migration("20210123223105_second")]
     partial class second
     {

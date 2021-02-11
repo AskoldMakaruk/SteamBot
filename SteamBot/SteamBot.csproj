@@ -6,24 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BotFramework" Version="0.5.0-dev-7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.2">
+    <!--<PackageReference Include="BotFramework" Version="1.0.0-alpha-18" />
+    <PackageReference Include="BotFramework.Abstractions" Version="1.0.0-alpha-17" />-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-    <PackageReference Include="Npgsql" Version="5.0.2" />
+    <PackageReference Include="Npgsql" Version="5.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
 
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
     <PackageReference Include="Telegram.Bot" Version="15.7.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +43,15 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BotFramework">
+      <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="BotFramework.Abstractions">
+      <HintPath>..\..\BotFramework\BotFramework.Abstractions\bin\Debug\netstandard2.1\BotFramework.Abstractions.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 	<ItemGroup>

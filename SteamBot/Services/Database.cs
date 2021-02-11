@@ -3,14 +3,29 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using SteamBot.Model;
 using Telegram.Bot.Types;
-using Image = SteamBot.Model.Image;
 
 namespace SteamBot.Services
 {
-	public class TelegramContext : DbContext
+
+	//uncomment in case of a migration
+	//public class AppDbContextFactory : IDesignTimeDbContextFactory<Database>
+	//{
+	//	public Database CreateDbContext(string[] args)
+	//	{
+	//		var optionsBuilder = new DbContextOptionsBuilder<Database>();
+	//		var _configuration = Program.GetConfiguration();
+	//		optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
+	//		optionsBuilder.UseLazyLoadingProxies();
+
+	//		return new Database(optionsBuilder.Options);
+	//	}
+	//}
+
+	public class Database : DbContext
 	{
 		public DbSet<Account> Accounts { get; set; }
 		public DbSet<Image> Images { get; set; }
@@ -18,13 +33,17 @@ namespace SteamBot.Services
 		public DbSet<Trade> Trades { get; set; }
 		public DbSet<SteamItem> SteamItems { get; set; }
 		public DbSet<ChatRoom> ChatRooms { get; set; }
+		public DbSet<Translation> Translations { get; set; }
+
+		public Database(DbContextOptions<Database> options) : base(options) { }
+
+		public Database() { }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			var configuration = Program.GetConfiguration();
-			optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-			optionsBuilder.UseLazyLoadingProxies();
-
+			//var _configuration = Program.GetConfiguration();
+			//optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
+			//optionsBuilder.UseLazyLoadingProxies();
 			base.OnConfiguring(optionsBuilder);
 		}
 
@@ -41,7 +60,7 @@ namespace SteamBot.Services
 
 			modelBuilder.Entity<Skin>(builder =>
 			{
-				builder.HasAlternateKey(c => new { c.SkinName, c.WeaponName }).HasName("IX_Fullname");
+				builder.HasAlternateKey(c => new {c.SkinName, c.WeaponName}).HasName("IX_Fullname");
 				builder.HasMany(a => a.Trades).WithOne(a => a.Skin);
 
 				builder.HasMany(a => a.Prices)

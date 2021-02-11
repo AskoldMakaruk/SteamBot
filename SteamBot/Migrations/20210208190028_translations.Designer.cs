@@ -10,8 +10,8 @@ using SteamBot.Services;
 namespace SteamBot.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20210126152100_nineth")]
-    partial class nineth
+    [Migration("20210208190028_translations")]
+    partial class translations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,6 +51,36 @@ namespace SteamBot.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("SteamBot.Model.ChatRoom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<bool>("AllMembersInside")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("InviteLink")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastMemberChange")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("TradeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TradeId")
+                        .IsUnique();
+
+                    b.ToTable("ChatRooms");
+                });
+
             modelBuilder.Entity("SteamBot.Model.Image", b =>
                 {
                     b.Property<int>("Id")
@@ -76,31 +106,10 @@ namespace SteamBot.Migrations
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int?>("BattleScarredImageId")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("BattleScarredPrice")
-                        .HasColumnType("double precision");
-
                     b.Property<DateTime>("CreateTS")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("NOW()");
-
-                    b.Property<int?>("FactoryNewImageId")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("FactoryNewPrice")
-                        .HasColumnType("double precision");
-
-                    b.Property<int?>("FieldTestedImageId")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("FieldTestedPrice")
-                        .HasColumnType("double precision");
-
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsFloated")
                         .HasColumnType("boolean");
@@ -110,15 +119,6 @@ namespace SteamBot.Migrations
 
                     b.Property<bool>("IsStatTrak")
                         .HasColumnType("boolean");
-
-                    b.Property<int?>("MinimalWearImageId")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("MinimalWearPrice")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("Price")
-                        .HasColumnType("double precision");
 
                     b.Property<string>("SearchName")
                         .HasColumnType("text");
@@ -139,30 +139,46 @@ namespace SteamBot.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("WellWornImageId")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("WellWornPrice")
-                        .HasColumnType("double precision");
-
                     b.HasKey("Id");
 
                     b.HasAlternateKey("SkinName", "WeaponName")
                         .HasName("IX_Fullname");
 
-                    b.HasIndex("BattleScarredImageId");
+                    b.ToTable("Skins");
+                });
 
-                    b.HasIndex("FactoryNewImageId");
+            modelBuilder.Entity("SteamBot.Model.SkinPrice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
 
-                    b.HasIndex("FieldTestedImageId");
+                    b.Property<float?>("Float")
+                        .HasColumnType("real");
+
+                    b.Property<string>("FloatName")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SkinId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("StatTrak")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ImageId");
 
-                    b.HasIndex("MinimalWearImageId");
+                    b.HasIndex("SkinId");
 
-                    b.HasIndex("WellWornImageId");
-
-                    b.ToTable("Skins");
+                    b.ToTable("SkinPrice");
                 });
 
             modelBuilder.Entity("SteamBot.Model.SteamItem", b =>
@@ -196,16 +212,28 @@ namespace SteamBot.Migrations
                     b.Property<int?>("BuyerId")
                         .HasColumnType("integer");
 
+                    b.Property<double?>("BuyerPrice")
+                        .HasColumnType("double precision");
+
                     b.Property<long>("ChannelPostId")
                         .HasColumnType("bigint");
+
+                    b.Property<float>("Float")
+                        .HasColumnType("real");
 
                     b.Property<int?>("SellerId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
+                    b.Property<double?>("SellerPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<int?>("SkinId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TradeItemId")
+                    b.Property<double>("StartPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -214,71 +242,56 @@ namespace SteamBot.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.HasIndex("TradeItemId");
+                    b.HasIndex("SkinId");
 
                     b.ToTable("Trades");
                 });
 
-            modelBuilder.Entity("SteamBot.Model.TradeItem", b =>
+            modelBuilder.Entity("SteamBot.Model.Translation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<float>("Float")
-                        .HasColumnType("real");
+                    b.Property<string>("En")
+                        .HasColumnType("text");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double precision");
+                    b.Property<string>("KeyName")
+                        .HasColumnType("text");
 
-                    b.Property<int?>("SkinId")
-                        .HasColumnType("integer");
+                    b.Property<string>("Ru")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SkinId");
-
-                    b.ToTable("Items");
+                    b.ToTable("Translations");
                 });
 
-            modelBuilder.Entity("SteamBot.Model.Skin", b =>
+            modelBuilder.Entity("SteamBot.Model.ChatRoom", b =>
                 {
-                    b.HasOne("SteamBot.Model.Image", "BattleScarredImage")
-                        .WithMany()
-                        .HasForeignKey("BattleScarredImageId");
+                    b.HasOne("SteamBot.Model.Trade", "Trade")
+                        .WithOne("Room")
+                        .HasForeignKey("SteamBot.Model.ChatRoom", "TradeId");
 
-                    b.HasOne("SteamBot.Model.Image", "FactoryNewImage")
-                        .WithMany()
-                        .HasForeignKey("FactoryNewImageId");
+                    b.Navigation("Trade");
+                });
 
-                    b.HasOne("SteamBot.Model.Image", "FieldTestedImage")
-                        .WithMany()
-                        .HasForeignKey("FieldTestedImageId");
-
+            modelBuilder.Entity("SteamBot.Model.SkinPrice", b =>
+                {
                     b.HasOne("SteamBot.Model.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
 
-                    b.HasOne("SteamBot.Model.Image", "MinimalWearImage")
-                        .WithMany()
-                        .HasForeignKey("MinimalWearImageId");
-
-                    b.HasOne("SteamBot.Model.Image", "WellWornImage")
-                        .WithMany()
-                        .HasForeignKey("WellWornImageId");
-
-                    b.Navigation("BattleScarredImage");
-
-                    b.Navigation("FactoryNewImage");
-
-                    b.Navigation("FieldTestedImage");
+                    b.HasOne("SteamBot.Model.Skin", "Skin")
+                        .WithMany("Prices")
+                        .HasForeignKey("SkinId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Image");
 
-                    b.Navigation("MinimalWearImage");
-
-                    b.Navigation("WellWornImage");
+                    b.Navigation("Skin");
                 });
 
             modelBuilder.Entity("SteamBot.Model.SteamItem", b =>
@@ -295,43 +308,43 @@ namespace SteamBot.Migrations
             modelBuilder.Entity("SteamBot.Model.Trade", b =>
                 {
                     b.HasOne("SteamBot.Model.Account", "Buyer")
-                        .WithMany()
+                        .WithMany("Buys")
                         .HasForeignKey("BuyerId");
 
                     b.HasOne("SteamBot.Model.Account", "Seller")
                         .WithMany("Trades")
                         .HasForeignKey("SellerId");
 
-                    b.HasOne("SteamBot.Model.TradeItem", "TradeItem")
-                        .WithMany()
-                        .HasForeignKey("TradeItemId");
+                    b.HasOne("SteamBot.Model.Skin", "Skin")
+                        .WithMany("Trades")
+                        .HasForeignKey("SkinId");
 
                     b.Navigation("Buyer");
 
                     b.Navigation("Seller");
-
-                    b.Navigation("TradeItem");
-                });
-
-            modelBuilder.Entity("SteamBot.Model.TradeItem", b =>
-                {
-                    b.HasOne("SteamBot.Model.Skin", "Skin")
-                        .WithMany("TradeItems")
-                        .HasForeignKey("SkinId");
 
                     b.Navigation("Skin");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Account", b =>
                 {
+                    b.Navigation("Buys");
+
                     b.Navigation("Trades");
                 });
 
             modelBuilder.Entity("SteamBot.Model.Skin", b =>
                 {
+                    b.Navigation("Prices");
+
                     b.Navigation("SteamItem");
 
-                    b.Navigation("TradeItems");
+                    b.Navigation("Trades");
+                });
+
+            modelBuilder.Entity("SteamBot.Model.Trade", b =>
+                {
+                    b.Navigation("Room");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Model;
 using SteamBot.Services;
@@ -14,9 +12,9 @@ namespace SteamBot.Commands
 {
 	public class AgreeOnPrice : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 
-		public AgreeOnPrice(TelegramContext context)
+		public AgreeOnPrice(Database context)
 		{
 			_context = context;
 		}
@@ -25,7 +23,7 @@ namespace SteamBot.Commands
 			=> message.Message?.Text == "Set price";
 
 		//todo redo with db save
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
 			var chatRoom = await _context.ChatRooms.FirstOrDefaultAsync(a => a.ChatId == update.Chat.Id);
@@ -40,7 +38,7 @@ namespace SteamBot.Commands
 
 				if (msg.From.Id == trade.Seller.ChatId)
 				{
-					if (double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice))
+					if (Double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out sellersPrice))
 					{
 						trade.SellerPrice = sellersPrice;
 					}
@@ -48,7 +46,7 @@ namespace SteamBot.Commands
 
 				if (msg.From.Id == trade.Buyer.ChatId)
 				{
-					if (double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out buyersPrice))
+					if (Double.TryParse(msg.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out buyersPrice))
 					{
 						trade.BuyerPrice = buyersPrice;
 					}
@@ -61,7 +59,6 @@ namespace SteamBot.Commands
 			await client.SendTextMessage("Price set", chatRoom.ChatId);
 			await client.SendTextMessage("Please send item of money yeah", chatRoom.ChatId);
 			await _context.SaveChangesAsync();
-			return default;
 		}
 	}
 }

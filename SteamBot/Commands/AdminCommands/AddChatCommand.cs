@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using SteamBot.Model;
 using SteamBot.Services;
 using Telegram.Bot.Types;
@@ -15,10 +13,10 @@ namespace SteamBot.Commands.AdminCommands
 {
 	public class AddChatCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 		private readonly SteamService _steamService;
 
-		public AddChatCommand(TelegramContext context, SteamService steamService)
+		public AddChatCommand(Database context, SteamService steamService)
 		{
 			_context = context;
 			_steamService = steamService;
@@ -28,7 +26,7 @@ namespace SteamBot.Commands.AdminCommands
 			=> message?.Message?.Text == "/addchat";
 
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
 			var chat = update.Chat;
@@ -37,13 +35,13 @@ namespace SteamBot.Commands.AdminCommands
 			var account = _context.GetAccount(update);
 			if (!account.IsAdmin)
 			{
-				return default;
+				return;
 			}
 
 			if (chat.Type != ChatType.Group && chat.Type != ChatType.Supergroup)
 			{
 				await client.SendTextMessage("Wrong chat type.", chat);
-				return default;
+				return;
 			}
 
 
@@ -64,7 +62,7 @@ namespace SteamBot.Commands.AdminCommands
 
 			var builder = new StringBuilder();
 			var props = typeof(ChatPermissions).GetProperties();
-			
+
 			foreach (var prop in props)
 			{
 				if (permissions[prop.Name] != (bool?) prop.GetValue(chat.Permissions))
@@ -77,7 +75,7 @@ namespace SteamBot.Commands.AdminCommands
 			if (!configuredCorrectly)
 			{
 				await client.SendTextMessage(builder.ToString(), chat);
-				return default;
+				return;
 			}
 
 			string text;
@@ -97,7 +95,7 @@ namespace SteamBot.Commands.AdminCommands
 				catch
 				{
 					await client.SendTextMessage("Bot doesn't have admin rights.");
-					return default;
+					return;
 				}
 			}
 			else
@@ -118,7 +116,6 @@ namespace SteamBot.Commands.AdminCommands
 
 			var chats = _context.ChatRooms.ToList();
 			await client.SendTextMessage(text + $"\n\nTotal chat count: {chats.Count}\nFree: {chats.Count(a => a.TradeId == null)}", chat);
-			return default;
 		}
 	}
 }

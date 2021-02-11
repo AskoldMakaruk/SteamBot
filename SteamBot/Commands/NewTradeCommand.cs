@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using SteamBot.Localization;
 using SteamBot.Services;
 using Telegram.Bot.Types;
@@ -14,10 +11,10 @@ namespace SteamBot.Commands
 {
 	public class NewTradeCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 		private readonly SteamService _steamService;
 
-		public NewTradeCommand(TelegramContext context, SteamService steamService)
+		public NewTradeCommand(Database context, SteamService steamService)
 		{
 			_context = context;
 			_steamService = steamService;
@@ -25,7 +22,7 @@ namespace SteamBot.Commands
 
 		public override bool SuitableLast(Update message) => message?.Message?.Text == Texts.NewTradeBtn;
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
 
@@ -65,8 +62,6 @@ namespace SteamBot.Commands
 
 				message = await client.GetTextMessage();
 			}
-
-			return new Response();
 		}
 	}
 
@@ -74,7 +69,7 @@ namespace SteamBot.Commands
 	//{
 	//	public override bool SuitableFirst(Update message) => message?.ChannelPost != null;
 
-	//	public override async Task<Response> Execute(IClient client)
+	//	public override async Task Execute(IClient client)
 	//	{
 	//		var update = await client.GetUpdate();
 	//		Console.WriteLine(update.ChannelPost.Chat.Id);

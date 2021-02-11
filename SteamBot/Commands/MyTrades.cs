@@ -1,10 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Localization;
 using SteamBot.Services;
@@ -15,16 +14,16 @@ namespace SteamBot.Commands
 {
 	public class MyTrades : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 
-		public MyTrades(TelegramContext context)
+		public MyTrades(Database context)
 		{
 			_context = context;
 		}
 
 		public override bool SuitableFirst(Update message) => message?.Message?.Text == Texts.MyTradesBtn;
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
 			var update = await client.GetTextMessage();
 			var account = _context.GetAccount(update);
@@ -46,13 +45,12 @@ namespace SteamBot.Commands
 			}
 
 			var text = builder.ToString();
-			if (string.IsNullOrEmpty(text))
+			if (String.IsNullOrEmpty(text))
 			{
 				text = "You don't have current trades.";
 			}
 
 			await client.SendTextMessage(text, parseMode: ParseMode.Markdown, disableWebPagePreview: true);
-			return new Response();
 		}
 	}
 }

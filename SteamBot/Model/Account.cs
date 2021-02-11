@@ -50,7 +50,7 @@ namespace SteamBot.Model
 		Open,
 		WaitingForParticipantsToJoin,
 		Discussion,
-		
+
 		PriceConfirmation,
 		PaymentConfirmation,
 		Closed
@@ -81,5 +81,13 @@ namespace SteamBot.Model
 		public DateTime LastMemberChange { get; set; }
 
 		public virtual Trade Trade { get; set; }
+	}
+
+	public class Translation
+	{
+		public int Id { get; set; }
+		public string KeyName { get; set; }
+		public string Ru { get; set; }
+		public string En { get; set; }
 	}
 }

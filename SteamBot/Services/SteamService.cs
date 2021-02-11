@@ -13,9 +13,9 @@ namespace SteamBot.Services
 	public class SteamService
 	{
 		private readonly SteamApiClient _client;
-		private readonly TelegramContext _context;
+		private readonly Database _context;
 
-		public SteamService(SteamApiClient client, TelegramContext context)
+		public SteamService(SteamApiClient client, Database context)
 		{
 			_client = client;
 			_context = context;

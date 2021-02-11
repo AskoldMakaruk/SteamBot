@@ -1,40 +1,40 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BotFramework.Clients;
+using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
-using BotFramework.Commands;
-using BotFramework.Responses;
-using SteamBot.Localization;
+using SteamBot.Middleware;
+using SteamBot.Model;
 using SteamBot.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
 	public class StartCommand : StaticCommand
 	{
-		private readonly TelegramContext _context;
+		private readonly Database _context;
+		private readonly Account account;
 
-		public StartCommand(TelegramContext context)
+		public StartCommand(Database context, AccountContext accountContext)
 		{
 			_context = context;
+			account = accountContext.Account;
 		}
 
 		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/start";
 
-		public override async Task<Response> Execute(IClient client)
+		public override async Task Execute(IClient client)
 		{
-			var update = await client.GetUpdate();
-			var account = _context.GetAccount(update.Message);
+			_ = await client.GetUpdate();
 			if (account.TradeUrl is null)
 			{
-				await client.SendTextMessage(Texts.EnterTradeUrlText, disableWebPagePreview: true, parseMode: ParseMode.Markdown);
+				await client.SendTextMessage(Locales["EN"]["EnterTradeUrlText"], disableWebPagePreview: true, parseMode: ParseMode.Markdown);
 				var message = await client.GetTextMessage();
 
 				while (!Uri.IsWellFormedUriString(message.Text, UriKind.Absolute))
 				{
-					await client.SendTextMessage(Texts.EnterUrlText);
+					await client.SendTextMessage(Locales["EN"]["EnterTradeUrlText"]);
 					message = await client.GetTextMessage();
 				}
 
@@ -42,9 +42,7 @@ namespace SteamBot.Commands
 				await _context.SaveChangesAsync();
 			}
 
-			await client.SendTextMessage(Texts.StartText, replyMarkup: Keys.StartKeys());
-
-			return new Response();
+			await client.SendTextMessage(Locales["EN"]["StartText"], replyMarkup: Keys.StartKeys());
 		}
 	}
 }

@@ -1,50 +1,83 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using BotFramework.Handlers;
-using Castle.DynamicProxy;
+using BotFramework;
+using BotFramework.Abstractions;
+using BotFramework.Clients;
+using BotFramework.Middleware;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Ninject.Modules;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Core;
 using SteamApi;
+using SteamBot.Middleware;
 using SteamBot.Services;
-using Telegram.Bot.Types;
+using Telegram.Bot;
 
 namespace SteamBot
 {
-	internal class Program
+	public static class Program
 	{
-		
+		public static UpdateDelegate app;
 
 		private static void Main()
 		{
 			CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
-			//var json = File.ReadAllText("compact.json");
-			//var jobject = JObject.Parse(json);
-			//var list = jobject.Children().OfType<JProperty>().Select(a => new {Name = a.Name, Price = a.Value.Value<double>()}).ToList();
 
-			//Console.WriteLine("Star items: " + list.Count(a => a.Name.Contains("★")));
-			//Console.WriteLine("AK's " + list.Count(a => a.Name.Contains("AK-47")));
-			//Console.WriteLine("IsStatTrak items: " + list.Count(a => a.Name.Contains("IsStatTrak")));
+			var host = Host.CreateDefaultBuilder()
+				.ConfigureHostConfiguration(configurationBuilder => configurationBuilder.AddEnvironmentVariables())
+				.ConfigureServices(services =>
+				{
+					var builder = new AppBuilder(services);
+					services.ConfigureServices(builder);
 
-			//Console.ReadLine();
-			//foreach (var child in jobject.Children().OfType<JProperty>())
-			//{
-			//	Console.WriteLine($"{child.Name}: {child.Value.Value<double>()}");
-			//}
+					builder.ConfigureMiddlewares();
 
-			//var st = Stopwatch.StartNew();
-			//var kernel = new StandardKernel(new Injector());
-			//var steamService = kernel.Get<SteamService>();
-			//steamService.UpdateDb().Wait();
-			//Console.WriteLine(st.Elapsed);
+					(_, app) = builder.Build();
+				})
+				.Build();
 
-			var config = GetConfiguration();
 
-			new HandlerConfigurationBuilder(config["BotToken"], typeof(Program).Assembly)
-				.UseConsoleDefaultLogger()
-				.WithCustomNinjectModules(new Injector())
-				.Build()
-				.RunInMemoryHandler();
+			var translations = host.Services.GetService<TranslationsService>();
+			translations?.ReloadTranslations();
+
+			var bot = host.Services.GetService<ITelegramBotClient>()!;
+			bot!.OnUpdate += (_, eventArgs) => app(eventArgs.Update);
+
+			bot.StartReceiving();
+			Console.ReadLine();
+		}
+
+		public static void ConfigureServices(this IServiceCollection services, IAppBuilder builder)
+		{
+			builder.UseStaticCommands();
+
+			services.AddTransient<IUpdateConsumer, Client>();
+			services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(GetConfiguration()["BotToken"]));
+
+			services.AddScoped<DictionaryContext>();
+
+			services.AddDbContext<Database>(options =>
+			{
+				var configuration = Program.GetConfiguration();
+				options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+				options.UseLazyLoadingProxies();
+			});
+
+			services.AddScoped<TranslationsService>();
+			services.AddScoped<SteamService>();
+			services.AddSingleton(_ => new SteamApiClient(Program.GetConfiguration()["SteamApiToken"]));
+			services.AddSingleton(_ => Program.GetConfiguration());
+		}
+
+		public static void ConfigureMiddlewares(this IAppBuilder builder)
+		{
+			builder.UseIdentity();
+			builder.UseStaticCommands();
 		}
 
 		public static IConfiguration GetConfiguration()
@@ -61,17 +94,6 @@ namespace SteamBot
 				.AddJsonFile($"{assemblyFolder}/appsettings.json", false, true)
 				.AddJsonFile($"{assemblyFolder}/appsettings.{env}.json", false, true)
 				.Build();
-		}
-	}
-
-	public class Injector : NinjectModule
-	{
-		public override void Load()
-		{
-			Bind<TelegramContext>().To<TelegramContext>();
-			Bind<SteamService>().To<SteamService>();
-			Bind<SteamApiClient>().ToMethod(_ => new SteamApiClient(Program.GetConfiguration()["SteamApiToken"]));
-			Bind<IConfiguration>().ToMethod(_ => Program.GetConfiguration());
 		}
 	}
 }
