@@ -7,18 +7,16 @@ using Telegram.Bot.Types;
 
 namespace SteamBot.Commands.AdminCommands
 {
-	public class UpdateDbCommand : StaticCommand
+	public class CloseAllTrades : StaticCommand
 	{
 		private readonly Database _context;
-		private readonly SteamService _steamService;
 
-		public UpdateDbCommand(SteamService steamService, Database context)
+		public CloseAllTrades(Database context)
 		{
-			_steamService = steamService;
 			_context = context;
 		}
 
-		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/updatedb";
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/closetrades";
 
 		public override async Task Execute(IClient client)
 		{
@@ -30,12 +28,16 @@ namespace SteamBot.Commands.AdminCommands
 				return;
 			}
 
-			var count = _context.Skins.Count();
-			await client.SendTextMessage($"Skins count is {count}.");
+			var rooms = _context.ChatRooms.ToList();
+			foreach (var room in rooms)
+			{
+				room.Trade.Room = null;
+				room.Trade = null;
+				room.TradeId = null;
+			}
 
-			await _steamService.UpdateDb();
-			count = _context.Skins.Count();
-			await client.SendTextMessage($"New skins count is {count}.");
+			await _context.SaveChangesAsync();
+			await client.SendTextMessage($"Free rooms {rooms.Count}.");
 		}
 	}
 }

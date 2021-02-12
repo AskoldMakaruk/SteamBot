@@ -7,6 +7,7 @@ using SteamBot.Localization;
 using SteamBot.Model;
 using SteamBot.Services;
 using Telegram.Bot.Types;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
@@ -34,7 +35,7 @@ namespace SteamBot.Commands
 
 			if (fl == null && skin.IsFloated)
 			{
-				await client.AnswerCallbackQuery(query.Id, "Select float please.");
+				await client.AnswerCallbackQuery(query.Id, Locales["SellSkin_SelectFloatErorr"]);
 				return;
 			}
 
@@ -48,7 +49,7 @@ namespace SteamBot.Commands
 				Status = TradeStatus.Open
 			};
 
-			await client.SendTextMessage(Texts.ResourceManager.GetString("EnterPrice"));
+			await client.SendTextMessage(Locales["SellSkin_EnterPrice"]);
 
 			account.CurrentTrade.StartPrice = await client.GetValue<double>();
 
@@ -79,11 +80,11 @@ namespace SteamBot.Commands
 				{
 					Console.WriteLine(e);
 					await transaction.RollbackAsync();
-					await client.SendTextMessage("Error proccessing your request.");
+					await client.SendTextMessage(Locales["SellSkin_Error"]);
 				}
 			}
 
-			await client.SendTextMessage(Texts.ResourceManager.GetString("TradeCreated"), replyMarkup: Keys.StartKeys());
+			await client.SendTextMessage(Locales["SellSkin_TradeCreated"], replyMarkup: Keys.StartKeys());
 		}
 	}
 }

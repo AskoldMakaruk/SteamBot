@@ -10,11 +10,9 @@ namespace SteamBot.Commands
 	public class StatTrakInlineCommand : StaticCommand
 	{
 		private readonly Database _context;
-		private readonly SteamService _steamService;
 
-		public StatTrakInlineCommand(SteamService steamService, Database context)
+		public StatTrakInlineCommand(Database context)
 		{
-			_steamService = steamService;
 			_context = context;
 		}
 

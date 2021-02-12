@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SteamBot;
 using SteamBot.Services;
 
@@ -27,16 +28,21 @@ namespace Tests
 
 			AppHost = Host.CreateDefaultBuilder()
 				.ConfigureHostConfiguration(configurationBuilder => configurationBuilder.AddEnvironmentVariables())
+				.ConfigureLogging((context, logging) =>
+				{
+					logging.AddConsole();
+					logging.AddFilter("Microsoft.EntityFrameworkCore.*", LogLevel.Warning);
+				})
 				.ConfigureAppDebug(appBuilder =>
 				{
 					var services = appBuilder.Services;
-					
+
 					services.ConfigureServices(appBuilder);
 
 					services.RemoveAll(typeof(IUpdateConsumer));
 					services.RemoveAll<Database>();
 					services.RemoveAll<DbContextOptions<Database>>();
-					
+
 					services.AddTransient<IUpdateConsumer, DebugClient>(_ => Client);
 
 					services.AddDbContext<Database>(options =>
@@ -45,9 +51,6 @@ namespace Tests
 						options.UseNpgsql(configuration.GetConnectionString("TestConnection"));
 						options.UseLazyLoadingProxies();
 					});
-
-
-					appBuilder.ConfigureMiddlewares();
 
 					(_, App) = appBuilder.Build();
 				})

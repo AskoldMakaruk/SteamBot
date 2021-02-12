@@ -14,7 +14,11 @@ namespace SteamBot
 		public const string Star = "★";
 		public const string StatTrak = "StatTrak™";
 
-		public static ResourceManager ResourceManager => Texts.ResourceManager;
+		public const string Float_Factory_New = "Factory New";
+		public const string Float_Minimal_Wear = "Minimal Wear";
+		public const string Float_Field_Tested = "Field-Tested";
+		public const string Float_Well_Worn = "Well-Worn";
+		public const string Float_Battle_Scarred = "Battle-Scarred";
 
 		public static IFormatProvider Provider
 		{
@@ -54,11 +58,11 @@ namespace SteamBot
 			var c = CultureInfo.GetCultureInfo(culture);
 			return new Dictionary<string, (float Start, float End)>
 			{
-				[ResourceManager.GetString("Float_Factory_New", c)] = new(0f, 0.07f),
-				[ResourceManager.GetString("Float_Minimal_Wear", c)] = new(0.08f, 0.15f),
-				[ResourceManager.GetString("Float_Field_Tested", c)] = new(0.16f, 0.38f),
-				[ResourceManager.GetString("Float_Well_Worn", c)] = new(0.39f, 0.45f),
-				[ResourceManager.GetString("Float_Battle_Scarred", c)] = new(0.46f, 1f)
+				[Float_Factory_New] = new(0f, 0.07f),
+				[Float_Minimal_Wear] = new(0.08f, 0.15f),
+				[Float_Field_Tested] = new(0.16f, 0.38f),
+				[Float_Well_Worn] = new(0.39f, 0.45f),
+				[Float_Battle_Scarred] = new(0.46f, 1f)
 			};
 		}
 

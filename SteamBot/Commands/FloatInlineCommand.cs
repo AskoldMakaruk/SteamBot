@@ -4,17 +4,16 @@ using BotFramework.Abstractions;
 using BotFramework.Clients.ClientExtensions;
 using SteamBot.Services;
 using Telegram.Bot.Types;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
 	public class FloatInlineCommand : StaticCommand
 	{
 		private readonly Database _context;
-		private readonly SteamService _steamService;
 
-		public FloatInlineCommand(SteamService steamService, Database context)
+		public FloatInlineCommand(Database context)
 		{
-			_steamService = steamService;
 			_context = context;
 		}
 
@@ -34,7 +33,7 @@ namespace SteamBot.Commands
 				var fl = (float) flN;
 				if (skin.GetPrice(fl) == null)
 				{
-					await client.AnswerCallbackQuery("Нет предмета с таким качеством.");
+					await client.AnswerCallbackQuery(Locales["NoItemWithSuchFloatError"]);
 				}
 
 				if (Equals(seletedFloat, fl))

@@ -5,6 +5,7 @@ using BotFramework.Clients.ClientExtensions;
 using Microsoft.EntityFrameworkCore;
 using SteamBot.Services;
 using Telegram.Bot.Types;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
@@ -17,8 +18,7 @@ namespace SteamBot.Commands
 			_context = context;
 		}
 
-		public override bool SuitableFirst(Update message)
-			=> (message.Message?.Text?.StartsWith("/start") ?? false) && message.Message?.Text?.Length > "/start".Length;
+		public override bool SuitableFirst(Update message) => (message.Message?.Text?.StartsWith("/start") ?? false) && message.Message?.Text?.Length > "/start".Length;
 
 		public override async Task Execute(IClient client)
 		{
@@ -31,20 +31,20 @@ namespace SteamBot.Commands
 
 			if (trade.Seller.Id == buyer.Id)
 			{
-				await client.SendTextMessage("Very funny...");
+				await client.SendTextMessage(Locales["SellerTryingToBuyHisItemError"]);
 				return;
 			}
 
 			if (trade.Buyer != null)
 			{
-				await client.SendTextMessage("This trade is already in progress. Soryy");
+				await client.SendTextMessage(Locales["TradeInProgressError"]);
 				return;
 			}
 
 			var freeRoom = await _context.ChatRooms.FirstOrDefaultAsync(a => a.TradeId == null);
 			if (freeRoom == null)
 			{
-				await client.SendTextMessage("No free rooms");
+				await client.SendTextMessage(Locales["NoFreeChatRoomsError"]);
 				//todo red flag for ilya
 				return;
 			}
@@ -58,7 +58,7 @@ namespace SteamBot.Commands
 			foreach (var userChat in new[] {client.UserId, trade.Seller.ChatId})
 			{
 				await client.UnbanChatMember((int) userChat, freeRoom.ChatId);
-				await client.SendTextMessage("Please, join this chat room to proceed:", userChat, replyMarkup: Keys.GroupMarkup(freeRoom.InviteLink));
+				await client.SendTextMessage(Locales["JoinChatRoomText"], userChat, replyMarkup: Keys.GroupMarkup(freeRoom.InviteLink));
 			}
 
 			//await client.SendTextMessage($"Someone wants to buy {trade.TradeItem.Skin.SearchName}. Do you accept?", replyMarkup: Keys.ConfirmBuyer(update.From.Id), chatId: trade.Seller.ChatId);

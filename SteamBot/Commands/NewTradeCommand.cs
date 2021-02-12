@@ -6,28 +6,25 @@ using SteamBot.Localization;
 using SteamBot.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
 	public class NewTradeCommand : StaticCommand
 	{
-		private readonly Database _context;
 		private readonly SteamService _steamService;
 
-		public NewTradeCommand(Database context, SteamService steamService)
+		public NewTradeCommand(SteamService steamService)
 		{
-			_context = context;
 			_steamService = steamService;
 		}
 
-		public override bool SuitableLast(Update message) => message?.Message?.Text == Texts.NewTradeBtn;
+		public override bool SuitableLast(Update message) => message?.Message?.Text == Locales["NewTradeBtn"];
 
 		public override async Task Execute(IClient client)
 		{
-			//fuck i need to migrate Texts."Key" -> ResourceManager.GetString("Key", culture)
-
 			var _ = await client.GetUpdate();
-			await client.SendTextMessage("Send item name to start:");
+			await client.SendTextMessage(Locales["NewTrade_SendItemText"]);
 			var message = await client.GetTextMessage();
 			while (true)
 			{
@@ -37,9 +34,9 @@ namespace SteamBot.Commands
 				if (skins.Count == 1 || sk is not null)
 				{
 					var skin = sk ?? skins.FirstOrDefault();
-					var fl = skin.GetPrice().Float;
+					var fl = skin?.GetPrice().Float;
 
-					if (skin.GetImage(fl)?.Bytes == null)
+					if (skin?.GetImage(fl)?.Bytes == null)
 					{
 						await _steamService.GetSteamItem(skin, fl);
 						//skin = await _context.Skins.FindAsync(skin.Id);
@@ -53,11 +50,11 @@ namespace SteamBot.Commands
 
 					markup.ResizeKeyboard = true;
 					markup.OneTimeKeyboard = true;
-					await client.SendTextMessage("Выберите скин короче)", replyMarkup: markup);
+					await client.SendTextMessage(Locales["NewTrade_ChooseSkin"], replyMarkup: markup);
 				}
 				else
 				{
-					await client.SendTextMessage("Ничего не найдено. Попробуйте еще раз");
+					await client.SendTextMessage(Locales["NewTrade_NothingFound"]);
 				}
 
 				message = await client.GetTextMessage();

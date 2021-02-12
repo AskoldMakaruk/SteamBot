@@ -33,24 +33,19 @@ namespace Tests.Commands
 		[Test]
 		public async Task StartCommandTest()
 		{
-			var scope = host.Services.CreateScope();
-
-			translations = scope.ServiceProvider.GetService<TranslationsService>();
+			translations = host.Services.GetService<TranslationsService>();
 
 			await app(Message("/start"));
 
-			Assert.AreEqual(translations["EN"]["EnterTradeUrlText"], (await client.GetRequest<SendMessageRequest>()).Text);
+			Assert.AreEqual(translations["EnterTradeUrlText"], (await client.GetRequest<SendMessageRequest>()).Text);
 
 			await app(Message("some non url text"));
 
-			Assert.AreEqual(translations["EN"]["EnterTradeUrlText"], (await client.GetRequest<SendMessageRequest>()).Text);
+			Assert.AreEqual(translations["EnterTradeUrlText"], (await client.GetRequest<SendMessageRequest>()).Text);
 
 			await app(Message("https://com.com"));
 
-			Assert.AreEqual(translations["EN"]["StartText"], (await client.GetRequest<SendMessageRequest>()).Text);
-
-			translations.SaveChanges();
-			scope.Dispose();
+			Assert.AreEqual(translations["StartText"], (await client.GetRequest<SendMessageRequest>()).Text);
 		}
 
 		public static Update Message(string text) => new()

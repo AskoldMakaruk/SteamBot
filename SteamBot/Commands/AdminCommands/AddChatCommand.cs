@@ -13,17 +13,25 @@ namespace SteamBot.Commands.AdminCommands
 {
 	public class AddChatCommand : StaticCommand
 	{
+		private static readonly IReadOnlyDictionary<string, bool> permissions = new Dictionary<string, bool>
+		{
+			["CanSendMessages"] = true,
+			["CanSendMediaMessages"] = true,
+			["CanSendOtherMessages"] = true,
+			["CanAddWebPagePreviews"] = true,
+			["CanInviteUsers"] = false,
+			["CanPinMessages"] = false,
+			["CanChangeInfo"] = false,
+			["CanSendPolls"] = false
+		};
 		private readonly Database _context;
-		private readonly SteamService _steamService;
 
-		public AddChatCommand(Database context, SteamService steamService)
+		public AddChatCommand(Database context)
 		{
 			_context = context;
-			_steamService = steamService;
 		}
 
-		public override bool SuitableFirst(Update message)
-			=> message?.Message?.Text == "/addchat";
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/addchat";
 
 
 		public override async Task Execute(IClient client)
@@ -48,17 +56,6 @@ namespace SteamBot.Commands.AdminCommands
 			var room = _context.ChatRooms.FirstOrDefault(ch => ch.ChatId == chat.Id);
 
 			var configuredCorrectly = true;
-			var permissions = new Dictionary<string, bool>
-			{
-				["CanSendMessages"] = true,
-				["CanSendMediaMessages"] = true,
-				["CanSendOtherMessages"] = true,
-				["CanAddWebPagePreviews"] = true,
-				["CanInviteUsers"] = false,
-				["CanPinMessages"] = false,
-				["CanChangeInfo"] = false,
-				["CanSendPolls"] = false
-			};
 
 			var builder = new StringBuilder();
 			var props = typeof(ChatPermissions).GetProperties();

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SteamBot.Services;
 using Telegram.Bot.Types;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
@@ -60,7 +61,7 @@ namespace SteamBot.Commands
 			}
 
 			await _context.SaveChangesAsync();
-			await client.SendTextMessage("Start trading guys..", chat);
+			await client.SendTextMessage(Locales["TradeStartText"], chat);
 		}
 	}
 }

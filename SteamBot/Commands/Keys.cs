@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SteamBot.Localization;
 using SteamBot.Model;
 using Telegram.Bot.Types.ReplyMarkups;
 using static SteamBot.Services.TranslationsService;
@@ -10,21 +9,7 @@ namespace SteamBot.Commands
 {
 	public static class Keys
 	{
-		public static readonly string Tick = "✅";
-
-		public static ReplyKeyboardMarkup ConfirmMarkup
-		{
-			get
-			{
-				ReplyKeyboardMarkup result = new[]
-				{
-					Texts.YesBtn
-				};
-				result.ResizeKeyboard = true;
-				result.OneTimeKeyboard = true;
-				return result;
-			}
-		}
+		public const string Tick = "✅";
 
 		public static ReplyKeyboardMarkup GroupMenu
 		{
@@ -32,8 +17,8 @@ namespace SteamBot.Commands
 			{
 				ReplyKeyboardMarkup result = new[]
 				{
-					"Cancel Trade",
-					"Set price"
+					Locales["CancelTrade"],
+					Locales["SetPrice"]
 				};
 				result.ResizeKeyboard = true;
 				result.OneTimeKeyboard = true;
@@ -48,13 +33,13 @@ namespace SteamBot.Commands
 			{
 				new[]
 				{
-					Locales["EN"]["NewTradeBtn"],
-					Texts.MyTradesBtn
+					Locales["NewTradeBtn"],
+					Locales["MyTradesBtn"]
 				},
 				new[]
 				{
-					Texts.MyMoneyBtn,
-					Texts.MyStats
+					Locales["MyFundsBtn"],
+					Locales["MyStatsBtn"]
 				}
 			};
 			startkeys.ResizeKeyboard = true;
@@ -73,9 +58,9 @@ namespace SteamBot.Commands
 						{
 							var (first, second) = c;
 
-							var tick = selectedFloat != null && second == Helper.GetFloatName((float) selectedFloat) ? Tick : String.Empty;
+							var tick = selectedFloat != null && second == Helper.GetFloatName((float)selectedFloat) ? Tick : String.Empty;
 
-							return new InlineKeyboardButton {CallbackData = $"{skin.Id} {second}", Text = $"{tick} {first}"};
+							return new InlineKeyboardButton { CallbackData = $"{skin.Id} {second}", Text = $"{tick} {first}" };
 						})
 						.ToList())
 					.ToList());
@@ -99,12 +84,12 @@ namespace SteamBot.Commands
 					new()
 					{
 						CallbackData = $"{skin.Id} Buy",
-						Text = "Buy"
+						Text = Locales["BuyBtn"]
 					},
 					new()
 					{
 						CallbackData = $"{skin.Id} Sell",
-						Text = "Sell"
+						Text = Locales["SellBtn"]
 					}
 				});
 
@@ -120,7 +105,7 @@ namespace SteamBot.Commands
 				new InlineKeyboardButton
 				{
 					CallbackData = $"{id} Buy",
-					Text = "Buy",
+					Text = Locales["BuyBtn"],
 					Url = $"https://t.me/{botName}?start={id}"
 				}
 			};
@@ -132,7 +117,7 @@ namespace SteamBot.Commands
 			{
 				new InlineKeyboardButton
 				{
-					Text = "Buy",
+					Text = Locales["BuyBtn"],
 					Url = inviteLink
 				}
 			};

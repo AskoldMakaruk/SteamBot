@@ -17,13 +17,4 @@
     <ProjectReference Include="..\SteamBot\SteamBot.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="BotFramework">
-      <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="BotFramework.Abstractions">
-      <HintPath>..\..\BotFramework\BotFramework.Abstractions\bin\Debug\netstandard2.1\BotFramework.Abstractions.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

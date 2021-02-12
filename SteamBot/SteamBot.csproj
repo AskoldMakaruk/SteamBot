@@ -6,8 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="BotFramework" Version="1.0.0-alpha-18" />
-    <PackageReference Include="BotFramework.Abstractions" Version="1.0.0-alpha-17" />-->
+    <PackageReference Include="BotFramework" Version="1.0.0-alpha-29" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
       <PrivateAssets>all</PrivateAssets>
@@ -16,6 +15,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
     <PackageReference Include="Npgsql" Version="5.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
 
@@ -45,24 +45,24 @@
 
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Reference Include="BotFramework">
       <HintPath>..\..\BotFramework\BotFramework\bin\Debug\net5.0\BotFramework.dll</HintPath>
     </Reference>
     <Reference Include="BotFramework.Abstractions">
       <HintPath>..\..\BotFramework\BotFramework.Abstractions\bin\Debug\netstandard2.1\BotFramework.Abstractions.dll</HintPath>
     </Reference>
-  </ItemGroup>
+  </ItemGroup>-->
 
-	<ItemGroup>
+	<!--<ItemGroup>
     <Compile Update="Localization\Texts.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Texts.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
+  </ItemGroup>-->
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <EmbeddedResource Update="Localization\Texts.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Texts.Designer.cs</LastGenOutput>
@@ -71,7 +71,7 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Texts.en.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <None Update=".gitignore">

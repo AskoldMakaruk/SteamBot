@@ -29,12 +29,12 @@ namespace SteamBot.Commands
 			_ = await client.GetUpdate();
 			if (account.TradeUrl is null)
 			{
-				await client.SendTextMessage(Locales["EN"]["EnterTradeUrlText"], disableWebPagePreview: true, parseMode: ParseMode.Markdown);
+				await client.SendTextMessage(Locales["EnterTradeUrlText"], disableWebPagePreview: true, parseMode: ParseMode.Markdown);
 				var message = await client.GetTextMessage();
 
 				while (!Uri.IsWellFormedUriString(message.Text, UriKind.Absolute))
 				{
-					await client.SendTextMessage(Locales["EN"]["EnterTradeUrlText"]);
+					await client.SendTextMessage(Locales["EnterTradeUrlText"]);
 					message = await client.GetTextMessage();
 				}
 
@@ -42,7 +42,7 @@ namespace SteamBot.Commands
 				await _context.SaveChangesAsync();
 			}
 
-			await client.SendTextMessage(Locales["EN"]["StartText"], replyMarkup: Keys.StartKeys());
+			await client.SendTextMessage(Locales["StartText"], replyMarkup: Keys.StartKeys());
 		}
 	}
 }

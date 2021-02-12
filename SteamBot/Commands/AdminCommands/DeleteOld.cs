@@ -7,18 +7,18 @@ using Telegram.Bot.Types;
 
 namespace SteamBot.Commands.AdminCommands
 {
-	public class UpdateDbCommand : StaticCommand
+	public class DeleteOld : StaticCommand
 	{
 		private readonly Database _context;
 		private readonly SteamService _steamService;
 
-		public UpdateDbCommand(SteamService steamService, Database context)
+		public DeleteOld(SteamService steamService, Database context)
 		{
 			_steamService = steamService;
 			_context = context;
 		}
 
-		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/updatedb";
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == "/deleteold";
 
 		public override async Task Execute(IClient client)
 		{
@@ -33,7 +33,7 @@ namespace SteamBot.Commands.AdminCommands
 			var count = _context.Skins.Count();
 			await client.SendTextMessage($"Skins count is {count}.");
 
-			await _steamService.UpdateDb();
+			await _context.DeleteOldSkins();
 			count = _context.Skins.Count();
 			await client.SendTextMessage($"New skins count is {count}.");
 		}

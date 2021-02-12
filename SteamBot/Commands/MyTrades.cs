@@ -9,6 +9,7 @@ using SteamBot.Localization;
 using SteamBot.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using static SteamBot.Services.TranslationsService;
 
 namespace SteamBot.Commands
 {
@@ -21,7 +22,7 @@ namespace SteamBot.Commands
 			_context = context;
 		}
 
-		public override bool SuitableFirst(Update message) => message?.Message?.Text == Texts.MyTradesBtn;
+		public override bool SuitableFirst(Update message) => message?.Message?.Text == Locales["MyTradesBtn"];
 
 		public override async Task Execute(IClient client)
 		{
@@ -41,13 +42,15 @@ namespace SteamBot.Commands
 				var skin = trade.Skin;
 				var roomLink = trade.Room != null ? $"[Trade chat]({trade.Room.InviteLink})\n" : "";
 
-				builder.AppendFormat("{0}. *{1}*\nFor: ${2}\nStatus: {3}\n{4}\n", i + 1, skin.SearchName, trade.StartPrice, trade.Status, roomLink);
+				builder.AppendFormat(Locales["ListTradeItem"], i + 1, skin.SearchName, trade.StartPrice, trade.Status, roomLink);
+				//builder.AppendFormat("{0}. *{1}*\nFor: ${2}\nStatus: {3}\n{4}\n", i + 1, skin.SearchName, trade.StartPrice, trade.Status, roomLink);
 			}
 
 			var text = builder.ToString();
 			if (String.IsNullOrEmpty(text))
 			{
-				text = "You don't have current trades.";
+				text = Locales["NoCurrentTradesText"];
+				//text = "You don't have current trades.";
 			}
 
 			await client.SendTextMessage(text, parseMode: ParseMode.Markdown, disableWebPagePreview: true);
